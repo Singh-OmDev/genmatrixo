@@ -1,0 +1,175 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════
+   GENMATRIXO V2 — BASE44 DESIGN SYSTEM
+   Sunlit Workspace with Electric Lime Accent
+   Warm Canvas (#faf9f7) & Pure Paper (#ffffff)
+   Whisper-Weight Display Typography & Pill Controls
+  ═══════════════════════════════════════════════════ */
+
+@theme {
+  /* Colors */
+  --color-lime-spark: #ebffb1;
+  --color-lime-bolt: #ade900;
+  --color-ember-outline: #d8723c;
+  --color-solar-orange: #ff7f47;
+  --color-sky-wash: #5db3cf;
+  --color-charcoal: #0f0f0f;
+  --color-ink: #232529;
+  --color-graphite: #2e3035;
+  --color-slate: #324158;
+  --color-stone-border: #cfcfcf;
+  --color-mist-border: #b7b7b7;
+  --color-hairline: #e6e6e6;
+  --color-canvas: transparent;
+  --color-canvas-inner: #fff0de;
+  --color-paper: #ffffff;
+  --color-pure-black: #000000;
+  --color-daybreak-horizon: #cfe0e0;
+
+  /* Typography — Font Families */
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, monospace;
+
+  /* Typography — Scale */
+  --text-caption: 10px;
+  --text-body: 14px;
+  --text-body-lg: 16px;
+  --text-subheading: 18px;
+  --text-heading-sm: 22px;
+  --text-heading: 34px;
+  --text-heading-lg: 42px;
+  --text-display: 56px;
+  --text-display-lg: 63px;
+
+  /* Spacing */
+  --spacing: 0.25rem; /* 4px base multiplier */
+
+  /* Border Radii */
+  --radius-sm: 3px;    /* tags small outline */
+  --radius-lg: 10px;   /* cards / inputs / images */
+  --radius-pill: 999px; /* buttons / announcements / toggles / suggestion chips */
+  --radius-full: 999px;
+
+  /* Shadows */
+  --shadow-md: rgba(34, 40, 42, 0.04) 0px 3px 10px 0px; /* Only on Product Preview Cards */
+}
+
+:root {
+  /* Gradients */
+  --gradient-solar-orange: linear-gradient(rgba(250, 249, 247, 0) 2.69%, rgb(255, 240, 222) 24.16%, rgb(255, 174, 83) 56.55%, rgba(255, 174, 83, 0) 98.02%);
+  --gradient-daybreak-horizon: linear-gradient(rgb(242, 241, 237) 42.49%, rgb(213, 223, 224) 93.98%, rgb(229, 255, 148) 104.08%);
+  --gradient-sky-wash: radial-gradient(circle at top, rgba(93, 179, 207, 0.18) 0%, rgba(250, 249, 247, 0) 70%);
+}
+
+/* ─────────────────────────────────────────
+   BASE RESETS
+  ───────────────────────────────────────── */
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+body {
+  background: linear-gradient(180deg, #faf9f7 0%, #fff0de 35%, #ffd2a1 70%, #fff0de 100%) no-repeat center center fixed;
+  background-size: cover;
+  background-color: #fff0de;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.55;
+  letter-spacing: normal;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--color-lime-spark);
+  color: var(--color-charcoal);
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--color-canvas); }
+::-webkit-scrollbar-thumb {
+  background: var(--color-stone-border);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--color-mist-border); }
+
+/* ─────────────────────────────────────────
+   TYPOGRAPHY BASE
+   Bold Display Sizing
+  ───────────────────────────────────────── */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  color: var(--color-pure-black);
+  font-weight: 700 !important; /* Force bold weight for readability */
+  line-height: 1.1;
+  letter-spacing: normal;
+}
+
+h1 {
+  font-size: clamp(2.25rem, 6vw, var(--text-display-lg));
+  line-height: 1.0;
+}
+
+h2 {
+  font-size: clamp(1.75rem, 4vw, var(--text-heading-lg));
+  line-height: 1.07;
+}
+
+h3 {
+  font-size: var(--text-heading);
+  line-height: 1.1;
+}
+
+p {
+  color: var(--color-ink);
+  font-size: 14px;
+  line-height: 1.6;
+  font-weight: 500;
+  letter-spacing: normal;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--color-canvas);
+  border: 1px solid var(--color-hairline);
+  border-radius: 3px;
+  padding: 1px 5px;
+  color: var(--color-ink);
+}
+
+/* ─────────────────────────────────────────
+   BASE44 CUSTOM UTILITIES
+  ───────────────────────────────────────── */
+
+/* Section Dividers */
+.divider-band-orange {
+  width: 100%;
+  height: 160px;
+  background: var(--gradient-solar-orange);
+}
+
+.divider-band-daybreak {
+  width: 100%;
+  height: 160px;
+  background: var(--gradient-daybreak-horizon);
+}
+
+/* Marquee movement */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.marquee-track {
+  animation: marquee 30s linear infinite;
+}
