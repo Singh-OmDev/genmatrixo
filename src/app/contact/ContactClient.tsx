@@ -71,12 +71,8 @@ export function ContactClient() {
     const compareDate = new Date(date);
     compareDate.setHours(0, 0, 0, 0);
 
-    // Must be in the future (tomorrow or later)
-    if (compareDate <= startOfToday) return false;
-
-    // Must not be a weekend
-    const dayOfWeek = compareDate.getDay();
-    if (dayOfWeek === 0 || dayOfWeek === 6) return false;
+    // Must be today or in the future
+    if (compareDate < startOfToday) return false;
 
     // Limit to next 30 days
     const maxDate = new Date(startOfToday);
