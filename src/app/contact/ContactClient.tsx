@@ -1,6 +1,4 @@
-"use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Mail, 
   Phone, 
@@ -33,7 +31,9 @@ const timeSlots = ["09:30 AM", "11:00 AM", "01:30 PM", "03:00 PM", "04:30 PM"];
 
 export function ContactClient() {
   // Calendar Widget State
-  const [selectedDate, setSelectedDate] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const [currentMonthDate, setCurrentMonthDate] = useState<Date>(() => new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [bookingStep, setBookingStep] = useState<"calendar" | "form" | "confirmed">("calendar");
   const [bookingForm, setBookingForm] = useState({ name: "", email: "", notes: "" });
@@ -44,11 +44,58 @@ export function ContactClient() {
   const [inquiryErrors, setInquiryErrors] = useState({ name: false, email: false, message: false });
   const [inquirySubmitted, setInquirySubmitted] = useState(false);
 
-  // Calendar dates details
+  // Initialize on mount to prevent hydration issues
+  useEffect(() => {
+    setMounted(true);
+    setCurrentMonthDate(new Date());
+  }, []);
+
   const today = new Date();
-  const currentMonth = today.toLocaleString("en-US", { month: "long" });
-  const currentYear = today.getFullYear();
-  const availableDays = [12, 13, 14, 15, 16, 19, 20, 21, 22, 23]; // business days mockup
+  const year = currentMonthDate.getFullYear();
+  const month = currentMonthDate.getMonth();
+  const currentMonthName = currentMonthDate.toLocaleString("en-US", { month: "long" });
+
+  const getDaysInMonth = (y: number, m: number) => new Date(y, m + 1, 0).getDate();
+  const getFirstDayOfWeek = (y: number, m: number) => {
+    const day = new Date(y, m, 1).getDay();
+    return day === 0 ? 6 : day - 1; // Mon-start
+  };
+
+  const totalDaysInMonth = getDaysInMonth(year, month);
+  const blankDaysCount = getFirstDayOfWeek(year, month);
+
+  const isDateAvailable = (date: Date) => {
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const compareDate = new Date(date);
+    compareDate.setHours(0, 0, 0, 0);
+
+    // Must be in the future (tomorrow or later)
+    if (compareDate <= startOfToday) return false;
+
+    // Must not be a weekend
+    const dayOfWeek = compareDate.getDay();
+    if (dayOfWeek === 0 || dayOfWeek === 6) return false;
+
+    // Limit to next 30 days
+    const maxDate = new Date(startOfToday);
+    maxDate.setDate(startOfToday.getDate() + 30);
+    return compareDate <= maxDate;
+  };
+
+  const isPrevDisabled = year < today.getFullYear() || (year === today.getFullYear() && month <= today.getMonth());
+  const isNextDisabled = year > today.getFullYear() || (year === today.getFullYear() && month >= today.getMonth() + 1);
+
+  const handlePrevMonth = () => {
+    if (isPrevDisabled) return;
+    setCurrentMonthDate(new Date(year, month - 1, 1));
+  };
+
+  const handleNextMonth = () => {
+    if (isNextDisabled) return;
+    setCurrentMonthDate(new Date(year, month + 1, 1));
+  };
 
   // Handle Calendar Book
   const handleCalendarBookSubmit = (e: React.FormEvent) => {
@@ -156,229 +203,262 @@ export function ContactClient() {
             </p>
           </div>
 
-          <div className="bg-card/40 border border-surface rounded-lg p-6 shadow-xl min-h-[460px] flex flex-col justify-between">
-            <AnimatePresence mode="wait">
-              
-              {/* STEP 1: CALENDAR VIEW */}
-              {bookingStep === "calendar" && (
-                <motion.div
-                  key="calendar"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.2 }}
-                  className="space-y-6"
-                >
-                  <div className="flex items-center justify-between border-b border-surface pb-4">
-                    <span className="text-xs font-display font-bold text-text-main uppercase tracking-wider">
-                      Select Date & Time
-                    </span>
-                    <div className="flex items-center gap-2 text-xs text-muted font-mono font-bold uppercase">
-                      <ChevronLeft size={16} className="opacity-40 cursor-not-allowed" />
-                      <span>{currentMonth} {currentYear}</span>
-                      <ChevronRight size={16} className="opacity-40 cursor-not-allowed" />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Calendar grid */}
-                    <div>
-                      <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-sans font-bold text-muted uppercase tracking-wider mb-2">
-                        <span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span>
+          <div className="bg-card/40 border border-surface rounded-lg p-6 shadow-xl min-h-[460px] flex flex-col justify-center">
+            {!mounted ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <div className="w-8 h-8 rounded-full border-4 border-primary/20 border-t-primary animate-spin mb-4" />
+                <span className="text-[13px] font-medium text-muted">Initializing calendar...</span>
+              </div>
+            ) : (
+              <AnimatePresence mode="wait">
+                
+                {/* STEP 1: CALENDAR VIEW */}
+                {bookingStep === "calendar" && (
+                  <motion.div
+                    key="calendar"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-6 flex-grow flex flex-col justify-between"
+                  >
+                    <div className="flex items-center justify-between border-b border-surface pb-4">
+                      <span className="text-xs font-display font-bold text-text-main uppercase tracking-wider">
+                        Select Date & Time
+                      </span>
+                      <div className="flex items-center gap-2 text-xs text-muted font-mono font-bold uppercase select-none">
+                        <button
+                          type="button"
+                          disabled={isPrevDisabled}
+                          onClick={handlePrevMonth}
+                          className={`p-1 rounded-full transition-colors ${
+                            isPrevDisabled ? "opacity-30 cursor-not-allowed" : "hover:bg-surface/50 cursor-pointer text-text-main"
+                          }`}
+                        >
+                          <ChevronLeft size={16} />
+                        </button>
+                        <span>{currentMonthName} {year}</span>
+                        <button
+                          type="button"
+                          disabled={isNextDisabled}
+                          onClick={handleNextMonth}
+                          className={`p-1 rounded-full transition-colors ${
+                            isNextDisabled ? "opacity-30 cursor-not-allowed" : "hover:bg-surface/50 cursor-pointer text-text-main"
+                          }`}
+                        >
+                          <ChevronRight size={16} />
+                        </button>
                       </div>
-                      <div className="grid grid-cols-7 gap-1 text-center">
-                        {Array.from({ length: 4 }).map((_, i) => (
-                          <span key={`blank-${i}`} className="p-2 text-transparent text-xs" />
-                        ))}
-                        
-                        {Array.from({ length: 28 }).map((_, i) => {
-                          const dayNumber = i + 1;
-                          const isAvailable = availableDays.includes(dayNumber);
-                          const isSelected = selectedDate === dayNumber;
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-grow items-start mt-2">
+                      {/* Calendar grid */}
+                      <div>
+                        <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-sans font-bold text-muted uppercase tracking-wider mb-2">
+                          <span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span>
+                        </div>
+                        <div className="grid grid-cols-7 gap-1 text-center">
+                          {Array.from({ length: blankDaysCount }).map((_, i) => (
+                            <span key={`blank-${i}`} className="p-2 text-transparent text-xs" />
+                          ))}
                           
-                          return (
-                            <button
-                              key={`day-${dayNumber}`}
-                              disabled={!isAvailable}
-                              onClick={() => {
-                                setSelectedDate(dayNumber);
-                                setSelectedSlot(null);
-                              }}
-                              className={`p-2 text-xs font-mono font-bold rounded transition-all cursor-pointer flex items-center justify-center h-8 w-8 mx-auto ${
-                                isSelected
-                                  ? "bg-primary text-white"
-                                  : isAvailable
-                                  ? "bg-surface/50 text-text-main border border-surface hover:border-primary/50"
-                                  : "text-muted/25 cursor-not-allowed"
-                              }`}
-                            >
-                              {dayNumber}
-                            </button>
-                          );
-                        })}
+                          {Array.from({ length: totalDaysInMonth }).map((_, i) => {
+                            const dayNumber = i + 1;
+                            const thisDate = new Date(year, month, dayNumber);
+                            const isAvailable = isDateAvailable(thisDate);
+                            const isSelected = selectedDate &&
+                              selectedDate.getDate() === dayNumber &&
+                              selectedDate.getMonth() === month &&
+                              selectedDate.getFullYear() === year;
+                            
+                            return (
+                              <button
+                                key={`day-${dayNumber}`}
+                                type="button"
+                                disabled={!isAvailable}
+                                onClick={() => {
+                                  setSelectedDate(thisDate);
+                                  setSelectedSlot(null);
+                                }}
+                                className={`p-2 text-xs font-mono font-bold rounded transition-all cursor-pointer flex items-center justify-center h-8 w-8 mx-auto ${
+                                  isSelected
+                                    ? "bg-primary text-white"
+                                    : isAvailable
+                                    ? "bg-surface/50 text-text-main border border-surface hover:border-primary/50"
+                                    : "text-muted/25 cursor-not-allowed"
+                                }`}
+                              >
+                                {dayNumber}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Time slots */}
+                      <div className="flex flex-col justify-center min-h-[160px]">
+                        {selectedDate ? (
+                          <div className="space-y-2">
+                            <span className="text-[10px] font-sans font-semibold text-muted uppercase tracking-wider block mb-2 text-center md:text-left">
+                              Slots for {selectedDate.toLocaleString("en-US", { month: "long" })} {selectedDate.getDate()}
+                            </span>
+                            <div className="grid grid-cols-1 gap-2 max-h-[160px] overflow-y-auto pr-1">
+                              {timeSlots.map((slot) => {
+                                const isSelected = selectedSlot === slot;
+                                return (
+                                  <button
+                                    key={slot}
+                                    type="button"
+                                    onClick={() => setSelectedSlot(slot)}
+                                    className={`py-2 px-3 text-xs font-semibold rounded border transition-all cursor-pointer text-center ${
+                                      isSelected
+                                        ? "bg-primary/20 border-primary text-primary"
+                                        : "bg-surface/30 border-surface text-muted hover:border-muted/30 hover:text-text-main"
+                                    }`}
+                                  >
+                                    {slot}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center p-8 text-center bg-surface/20 rounded border border-dashed border-surface h-full">
+                            <Calendar size={18} className="text-muted/30 mb-2" />
+                            <span className="text-[11px] text-muted leading-relaxed">
+                              Pick a date on the calendar to view slots.
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
 
-                    {/* Time slots */}
-                    <div className="flex flex-col justify-center">
-                      {selectedDate ? (
-                        <div className="space-y-2">
-                          <span className="text-[10px] font-sans font-semibold text-muted uppercase tracking-wider block mb-2 text-center md:text-left">
-                            Slots for {currentMonth} {selectedDate}
-                          </span>
-                          <div className="grid grid-cols-1 gap-2 max-h-[160px] overflow-y-auto pr-1">
-                            {timeSlots.map((slot) => {
-                              const isSelected = selectedSlot === slot;
-                              return (
-                                <button
-                                  key={slot}
-                                  onClick={() => setSelectedSlot(slot)}
-                                  className={`py-2 px-3 text-xs font-semibold rounded border transition-all cursor-pointer text-center ${
-                                    isSelected
-                                      ? "bg-primary/20 border-primary text-primary"
-                                      : "bg-surface/30 border-surface text-muted hover:border-muted/30 hover:text-text-main"
-                                  }`}
-                                >
-                                  {slot}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex flex-col items-center justify-center p-8 text-center bg-surface/20 rounded border border-dashed border-surface h-full">
-                          <Calendar size={18} className="text-muted/30 mb-2" />
-                          <span className="text-[11px] text-muted leading-relaxed">
-                            Pick a date on the calendar to view slots.
-                          </span>
-                        </div>
-                      )}
+                    <div className="flex justify-end pt-4 border-t border-surface">
+                      <Button
+                        disabled={!selectedDate || !selectedSlot}
+                        onClick={() => setBookingStep("form")}
+                        variant="primary"
+                        className="w-full md:w-auto"
+                      >
+                        Configure Details
+                        <ArrowRight size={14} />
+                      </Button>
                     </div>
-                  </div>
+                  </motion.div>
+                )}
 
-                  <div className="flex justify-end pt-4 border-t border-surface">
-                    <Button
-                      disabled={!selectedDate || !selectedSlot}
-                      onClick={() => setBookingStep("form")}
-                      variant="primary"
-                      className="w-full md:w-auto"
-                    >
-                      Configure Details
-                      <ArrowRight size={14} />
-                    </Button>
-                  </div>
-                </motion.div>
-              )}
+                {/* STEP 2: DETAILS FORM */}
+                {bookingStep === "form" && (
+                  <motion.form
+                    key="form"
+                    onSubmit={handleCalendarBookSubmit}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-4 flex-grow flex flex-col justify-between"
+                  >
+                    <div className="space-y-4">
+                      <div className="border-b border-surface pb-3 mb-2">
+                        <span className="text-xs font-display font-bold text-text-main uppercase tracking-wider">
+                          Meeting Details
+                        </span>
+                        <p className="text-[11px] text-muted mt-1 font-mono">
+                          📅 Meeting: {selectedDate?.toLocaleString("en-US", { month: "long" })} {selectedDate?.getDate()} at {selectedSlot} (Google Meet)
+                        </p>
+                      </div>
 
-              {/* STEP 2: DETAILS FORM */}
-              {bookingStep === "form" && (
-                <motion.form
-                  key="form"
-                  onSubmit={handleCalendarBookSubmit}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.2 }}
-                  className="space-y-4"
-                >
-                  <div className="border-b border-surface pb-3 mb-2">
-                    <span className="text-xs font-display font-bold text-text-main uppercase tracking-wider">
-                      Meeting Details
-                    </span>
-                    <p className="text-[11px] text-muted mt-1 font-mono">
-                      📅 Meeting: {currentMonth} {selectedDate} at {selectedSlot} (Google Meet)
+                      <div>
+                        <input
+                          type="text"
+                          placeholder="Your Name"
+                          required
+                          className={inputStyles(bookingErrors.name)}
+                          value={bookingForm.name}
+                          onChange={(e) => {
+                            setBookingForm({ ...bookingForm, name: e.target.value });
+                            if (bookingErrors.name) setBookingErrors({ ...bookingErrors, name: false });
+                          }}
+                        />
+                      </div>
+
+                      <div>
+                        <input
+                          type="email"
+                          placeholder="Business Email Address"
+                          required
+                          className={inputStyles(bookingErrors.email)}
+                          value={bookingForm.email}
+                          onChange={(e) => {
+                            setBookingForm({ ...bookingForm, email: e.target.value });
+                            if (bookingErrors.email) setBookingErrors({ ...bookingErrors, email: false });
+                          }}
+                        />
+                      </div>
+
+                      <div>
+                        <textarea
+                          rows={3}
+                          placeholder="Brief notes about your product scope..."
+                          className="w-full bg-surface border border-surface-variant/40 focus:border-primary px-4 py-3 rounded text-sm text-text-main focus:outline-none resize-none"
+                          value={bookingForm.notes}
+                          onChange={(e) => setBookingForm({ ...bookingForm, notes: e.target.value })}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3 pt-2 border-t border-surface mt-4">
+                      <Button
+                        type="button"
+                        onClick={() => setBookingStep("calendar")}
+                        variant="secondary"
+                        className="flex-1"
+                      >
+                        Back
+                      </Button>
+                      <Button type="submit" variant="primary" className="flex-1">
+                        Schedule Call
+                      </Button>
+                    </div>
+                  </motion.form>
+                )}
+
+                {/* STEP 3: BOOKING CONFIRMED */}
+                {bookingStep === "confirmed" && (
+                  <motion.div
+                    key="confirmed"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="flex flex-col items-center justify-center text-center p-8 space-y-4 flex-grow"
+                  >
+                    <div className="w-12 h-12 bg-primary/10 border border-primary/20 rounded-full flex items-center justify-center text-primary mb-2">
+                      <CheckCircle2 size={24} />
+                    </div>
+                    <h3 className="text-lg font-display font-bold text-text-main">
+                      Call Scheduled!
+                    </h3>
+                    <p className="text-xs text-muted max-w-sm leading-relaxed">
+                      Thank you, <strong className="text-text-main">{bookingForm.name}</strong>. We've sent a calendar invite with the conference link to <strong className="text-text-main">{bookingForm.email}</strong> for <strong className="text-text-main">{selectedDate?.toLocaleString("en-US", { month: "long" })} {selectedDate?.getDate()} at {selectedSlot}</strong>.
                     </p>
-                  </div>
-
-                  <div>
-                    <input
-                      type="text"
-                      placeholder="Your Name"
-                      required
-                      className={inputStyles(bookingErrors.name)}
-                      value={bookingForm.name}
-                      onChange={(e) => {
-                        setBookingForm({ ...bookingForm, name: e.target.value });
-                        if (bookingErrors.name) setBookingErrors({ ...bookingErrors, name: false });
-                      }}
-                    />
-                  </div>
-
-                  <div>
-                    <input
-                      type="email"
-                      placeholder="Business Email Address"
-                      required
-                      className={inputStyles(bookingErrors.email)}
-                      value={bookingForm.email}
-                      onChange={(e) => {
-                        setBookingForm({ ...bookingForm, email: e.target.value });
-                        if (bookingErrors.email) setBookingErrors({ ...bookingErrors, email: false });
-                      }}
-                    />
-                  </div>
-
-                  <div>
-                    <textarea
-                      rows={3}
-                      placeholder="Brief notes about your product scope..."
-                      className="w-full bg-surface border border-surface-variant/40 focus:border-primary px-4 py-3 rounded text-sm text-text-main focus:outline-none resize-none"
-                      value={bookingForm.notes}
-                      onChange={(e) => setBookingForm({ ...bookingForm, notes: e.target.value })}
-                    />
-                  </div>
-
-                  <div className="flex gap-3 pt-2">
-                    <Button
-                      type="button"
-                      onClick={() => setBookingStep("calendar")}
-                      variant="secondary"
-                      className="flex-1"
-                    >
-                      Back
-                    </Button>
-                    <Button type="submit" variant="primary" className="flex-1">
-                      Schedule Call
-                    </Button>
-                  </div>
-                </motion.form>
-              )}
-
-              {/* STEP 3: BOOKING CONFIRMED */}
-              {bookingStep === "confirmed" && (
-                <motion.div
-                  key="confirmed"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3 }}
-                  className="flex flex-col items-center justify-center text-center p-8 space-y-4 flex-grow"
-                >
-                  <div className="w-12 h-12 bg-primary/10 border border-primary/20 rounded-full flex items-center justify-center text-primary mb-2">
-                    <CheckCircle2 size={24} />
-                  </div>
-                  <h3 className="text-lg font-display font-bold text-text-main">
-                    Call Scheduled!
-                  </h3>
-                  <p className="text-xs text-muted max-w-sm leading-relaxed">
-                    Thank you, <strong className="text-text-main">{bookingForm.name}</strong>. We've sent a calendar invite with the conference link to <strong className="text-text-main">{bookingForm.email}</strong>.
-                  </p>
-                  <div className="pt-4 w-full">
-                    <Button
-                      onClick={() => {
-                        setBookingStep("calendar");
-                        setSelectedDate(null);
-                        setSelectedSlot(null);
-                        setBookingForm({ name: "", email: "", notes: "" });
-                      }}
-                      variant="secondary"
-                      className="w-full"
-                    >
-                      Book Another Slot
-                    </Button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                    <div className="pt-4 w-full">
+                      <Button
+                        onClick={() => {
+                          setBookingStep("calendar");
+                          setSelectedDate(null);
+                          setSelectedSlot(null);
+                          setBookingForm({ name: "", email: "", notes: "" });
+                        }}
+                        variant="secondary"
+                        className="w-full"
+                      >
+                        Book Another Slot
+                      </Button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            )}
           </div>
         </div>
 
