@@ -6,63 +6,35 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FadeUp } from "@/components/motion/FadeUp";
 
 const faqs = [
-  {
-    q: "How can we help your business?",
-    a: [
-      "Far beyond the usual challenges, in the world of digital innovation.",
-      "Our expert IT solutions help businesses thrive.",
-      "From the first steps of cloud integration to advanced AI deployment.",
-      "Our team guides every project with precision.",
-      "Connected yet customized, we ensure your business stays ahead in the digital landscape.",
-    ],
-  },
-  {
-    q: "How long does it take to build a professional website?",
-    a: [
-      "Typical website development takes 4–8 weeks.",
-      "Timeline depends on the website’s complexity.",
-      "Additional features may extend the schedule.",
-      "Client feedback and revisions are included in the timeframe.",
-      "Our team ensures timely delivery without compromising quality.",
-    ],
-  },
-  {
-    q: "How can you help my business with IT solutions?",
-    a: [
-      "We provide end-to-end IT consulting tailored to your business needs.",
-      "Our team implements advanced software and digital solutions.",
-      "We optimize processes to improve efficiency and productivity.",
-      "We offer cloud integration, cybersecurity, and IT infrastructure support.",
-      "Ongoing support ensures your technology continues to drive growth.",
-    ],
-  },
-  {
-    q: "What are the requirements for IT solutions?",
-    a: [
-      "We analyze your business goals and current IT infrastructure.",
-      "Identify key areas where technology can improve efficiency.",
-      "Determine software, hardware, and cloud solution requirements.",
-      "Assess cybersecurity and compliance needs for your operations.",
-      "Provide a customized IT strategy aligned with your objectives.",
-    ],
-  },
+  { q: "What types of services does GenMatrixo offer?",              a: "We engineer premium digital products across web development (Next.js runtimes), native/cross-platform mobile apps, multi-tenant SaaS platforms, custom databases, UI/UX designs, and strategic technology consulting." },
+  { q: "How long does a typical software development lifecycle take?", a: "Timelines depend entirely on project scope. A standard Web MVP or custom SaaS portal takes between 6 to 12 weeks, which includes discovery, UI design, backend configuration, testing, and cloud deployment." },
+  { q: "Do you offer post-launch support and SLA updates?",          a: "Yes, we provide ongoing, SLA-backed maintenance and scaling support. This covers version upgrades, security patches, cloud cost optimization, database maintenance, and continuous feature releases." },
+  { q: "What is your typical project delivery and payment workflow?", a: "We work on structured milestone schedules. Every phase—from UI approval to API verification—requires stakeholder sign-off. Payments are typically split across milestone achievements (e.g. Kickoff, Prototype, Beta, Deploy)." },
+  { q: "Do you work with startups or enterprise clients?",           a: "Both. We've built MVPs for early-stage startups and architected large-scale systems for enterprise clients. Our process adapts to your stage, budget, and technical complexity." },
+  { q: "What technologies do you primarily work with?",             a: "Our core stack is Next.js, React, Node.js, NestJS, PostgreSQL, MongoDB, Redis, and AWS/Docker for infrastructure. We adapt to your existing stack where needed." },
 ];
 
-function Item({ q, a, open, onToggle }: { q: string; a: string[]; open: boolean; onToggle: () => void }) {
+function AccordionItem({ q, a, open, onToggle }: { q: string; a: string; open: boolean; onToggle: () => void }) {
   return (
-    <div className="border-b border-hairline/60 last:border-0">
+    <div
+      className="mb-3 last:mb-0 shimmer-hover"
+      style={{ background: "#ffffff", borderRadius: 16, transition: "transform 0.2s cubic-bezier(0.23,1,0.32,1)", }}
+      onMouseEnter={(e) => ((e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px) scale(1.005)")}
+      onMouseLeave={(e) => ((e.currentTarget as HTMLDivElement).style.transform = "translateY(0) scale(1)")}
+    >
       <button
         onClick={onToggle}
-        className="w-full flex items-center justify-between gap-4 py-5 text-left group cursor-pointer"
+        className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left cursor-pointer focus:outline-none"
         aria-expanded={open}
       >
-        <span className="text-xs font-sans font-semibold text-pure-black tracking-[0.1em] uppercase">
+        <span className="font-display font-medium text-black" style={{ fontSize: 15, lineHeight: 1.45 }}>
           {q}
         </span>
-        <span 
-          className="shrink-0 w-6 h-6 rounded-full border border-stone-border bg-paper flex items-center justify-center text-charcoal group-hover:border-graphite transition-colors"
+        <span
+          className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-black transition-all"
+          style={{ background: "#f3f3f3", transform: open ? "rotate(45deg)" : "rotate(0deg)", transition: "transform 0.25s cubic-bezier(0.34,1.56,0.64,1)" }}
         >
-          {open ? <Minus size={12} className="stroke-[1.5]" /> : <Plus size={12} className="stroke-[1.5]" />}
+          <Plus size={14} strokeWidth={2} />
         </span>
       </button>
       <AnimatePresence initial={false}>
@@ -71,14 +43,12 @@ function Item({ q, a, open, onToggle }: { q: string; a: string[]; open: boolean;
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
             className="overflow-hidden"
           >
-            <ul className="pb-5 pl-4 list-disc space-y-1.5 font-sans text-xs text-graphite tracking-[0.1em] leading-relaxed max-w-2xl">
-              {a.map((item, idx) => (
-                <li key={idx}>{item}</li>
-              ))}
-            </ul>
+            <p className="px-6 pb-5 text-black/55 leading-relaxed" style={{ fontSize: 14, lineHeight: 1.65 }}>
+              {a}
+            </p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -90,30 +60,40 @@ export function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section id="faq" className="bg-canvas border-b border-hairline py-20 lg:py-28">
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-16">
-          <FadeUp>
-            <div>
-              <span className="text-xs font-sans uppercase tracking-[0.1em] text-graphite block mb-3">
-                Questions
-              </span>
-              <h2 className="text-pure-black font-display font-normal tracking-tight">
-                Frequently Asked Questions
-              </h2>
-              <p className="font-sans text-xs text-graphite mt-3 leading-relaxed tracking-[0.1em]">
-                Common queries regarding our development scope and terms.
-              </p>
-            </div>
+    <section id="faq" className="py-24 lg:py-32" style={{ background: "#7575f0" }}>
+      <div className="max-w-[1200px] mx-auto px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+
+          {/* Left: BLACK text on violet (fastht.ml) */}
+          <FadeUp className="lg:col-span-4">
+            <span
+              className="inline-block text-[11px] font-medium tracking-[0.18em] uppercase mb-5 px-3 py-1 rounded-full"
+              style={{ background: "rgba(255,255,255,0.28)", color: "#000" }}
+            >
+              FAQ
+            </span>
+            <h2
+              className="font-display font-medium mb-5"
+              style={{
+                fontSize: "clamp(32px, 4.5vw, 54px)",
+                lineHeight: 1.18,
+                letterSpacing: "-0.5px",
+                color: "#000000",   /* black on violet */
+              }}
+            >
+              Questions?{" "}
+              <span style={{ display: "block" }}>Answers.</span>
+            </h2>
+            <p style={{ fontSize: 16, lineHeight: 1.6, color: "#000", opacity: 0.65, maxWidth: 300 }}>
+              Common queries regarding our development lifecycle, methodologies, and engineering agreements.
+            </p>
           </FadeUp>
 
-          <FadeUp delay={0.1} className="lg:col-span-2">
-            <div
-              className="border border-hairline bg-[#f0eeeb]/60 px-6 shadow-none"
-              style={{ borderRadius: "10px" }}
-            >
+          {/* Right: animated accordion stack */}
+          <FadeUp delay={0.1} className="lg:col-span-8">
+            <div>
               {faqs.map((f, i) => (
-                <Item
+                <AccordionItem
                   key={i}
                   q={f.q}
                   a={f.a}
@@ -123,6 +103,7 @@ export function FAQ() {
               ))}
             </div>
           </FadeUp>
+
         </div>
       </div>
     </section>

@@ -1,52 +1,56 @@
 import type { Metadata } from "next";
 import { Hero } from "@/components/sections/Hero";
 import { CredibilityBar } from "@/components/sections/CredibilityBar";
-import { AboutUsSection } from "@/components/sections/AboutUsSection";
-import { ProblemStatement } from "@/components/sections/ProblemStatement";
 import { Services } from "@/components/sections/Services";
-import { Process as IndustriesSection } from "@/components/sections/Process";
+import { SaaSShowcase } from "@/components/sections/SaaSShowcase";
+import { CaseStudies } from "@/components/sections/CaseStudies";
+import { IndustriesWeServe } from "@/components/sections/IndustriesWeServe";
+import { Process } from "@/components/sections/Process";
+import { TechStack } from "@/components/sections/TechStack";
 import { Testimonials } from "@/components/sections/Testimonials";
 import { FAQ } from "@/components/sections/FAQ";
-import { CaseStudies as LatestTechnology } from "@/components/sections/CaseStudies";
 import { FinalCTA } from "@/components/sections/FinalCTA";
 
 export const metadata: Metadata = {
-  title: "GenMatrixo — Premium AI Engineering & Enterprise Software",
+  title: "GenMatrixo — Custom Software, Web Apps & Digital Solutions",
   description:
-    "Delivering innovative solutions tailored to your business needs, we help companies optimize operations and achieve growth.",
+    "We create websites, mobile applications, SaaS platforms, and custom software solutions that help businesses scale faster.",
 };
 
 export default function HomePage() {
   return (
     <>
-      {/* 1. Hero Carousel */}
+      {/* 1. Hero Section (Headline, Subheadline, Mock Dashboard, Grayscale Logos) */}
       <Hero />
       
-      {/* 2. Facts Stats Block */}
+      {/* 2. Proof Metrics Section */}
       <CredibilityBar />
       
-      {/* 3. About Us Section */}
-      <AboutUsSection />
-      
-      {/* 4. Why Choose Us Features */}
-      <ProblemStatement />
-      
-      {/* 5. Our Services Grid */}
+      {/* 3. Services Grid (7 Core Capabilities) */}
       <Services />
+
+      {/* 4. Build Your SaaS Product breakout */}
+      <SaaSShowcase />
       
-      {/* 6. Industries We Serve (originally Process.tsx) */}
-      <IndustriesSection />
+      {/* 5. Featured Case Studies */}
+      <CaseStudies />
+
+      {/* 6. Industries We Serve */}
+      <IndustriesWeServe />
       
-      {/* 7. Client Testimonials */}
+      {/* 7. Our Process Timeline (6 Stages) */}
+      <Process />
+
+      {/* 8. Tech Stack Visual Grid */}
+      <TechStack />
+      
+      {/* 9. Client Testimonials */}
       <Testimonials />
       
-      {/* 8. Frequently Asked Questions */}
+      {/* 10. Frequently Asked Questions (Accordion) */}
       <FAQ />
       
-      {/* 9. Latest Technology / Blog (originally CaseStudies.tsx) */}
-      <LatestTechnology />
-      
-      {/* 10. Quote Form Request */}
+      {/* 11. Interactive Discovery Call Scheduler */}
       <FinalCTA />
     </>
   );

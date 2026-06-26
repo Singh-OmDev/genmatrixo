@@ -1,71 +1,136 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════
-   GENMATRIXO V2 — BASE44 DESIGN SYSTEM
-   Sunlit Workspace with Electric Lime Accent
-   Warm Canvas (#faf9f7) & Pure Paper (#ffffff)
-   Whisper-Weight Display Typography & Pill Controls
-  ═══════════════════════════════════════════════════ */
+   GENMATRIXO V2 — FASTHTML-STYLE DESIGN SYSTEM
+   Sticker-pack logic: pills, confetti, hard color blocks
+   Geist typography · alternating full-bleed bands
+   ═══════════════════════════════════════════════════ */
 
 @theme {
-  /* Colors */
-  --color-lime-spark: #ebffb1;
-  --color-lime-bolt: #ade900;
-  --color-ember-outline: #d8723c;
-  --color-solar-orange: #ff7f47;
-  --color-sky-wash: #5db3cf;
-  --color-charcoal: #0f0f0f;
-  --color-ink: #232529;
-  --color-graphite: #2e3035;
-  --color-slate: #324158;
-  --color-stone-border: #cfcfcf;
-  --color-mist-border: #b7b7b7;
-  --color-hairline: #e6e6e6;
-  --color-canvas: transparent;
-  --color-canvas-inner: #fff0de;
-  --color-paper: #ffffff;
-  --color-pure-black: #000000;
-  --color-daybreak-horizon: #cfe0e0;
+  /* ── Colors ── */
+  --color-sticker-green: #3cdd8c;
+  --color-sticker-yellow: #ffc435;
+  --color-sticker-pink: #e699d9;
+  --color-periwinkle-violet: #7575f0;
+  --color-soft-periwinkle: #939eeb;
+  --color-deep-aubergine: #3a2234;
+  --color-mint-cream: #d4f7e6;
+  --color-cotton-candy: #ffccf7;
+  --color-butter-cream: #ffeecc;
+  --color-lavender-mist: #e8e8fc;
+  --color-dusty-mauve: #eddee9;
+  --color-carbon: #000000;
+  --color-paper-white: #ffffff;
+  --color-fog: #f3f3f3;
+  --color-silver: #e5e7eb;
+  --color-ash: #cccccc;
+  --color-graphite: #999999;
+  --color-slate: #333333;
 
-  /* Typography — Font Families */
-  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-mono: var(--font-mono), ui-monospace, monospace;
+  /* Legacy aliases so existing Tailwind classes still work */
+  --color-background: #ffffff;
+  --color-surface: #f3f3f3;
+  --color-surface-variant: #e5e7eb;
+  --color-card: #ffffff;
+  --color-primary: #000000;
+  --color-secondary: #7575f0;
+  --color-accent: #3cdd8c;
+  --color-text-main: #000000;
+  --color-muted: #333333;
 
-  /* Typography — Scale */
-  --text-caption: 10px;
-  --text-body: 14px;
-  --text-body-lg: 16px;
-  --text-subheading: 18px;
-  --text-heading-sm: 22px;
-  --text-heading: 34px;
-  --text-heading-lg: 42px;
-  --text-display: 56px;
-  --text-display-lg: 63px;
+  /* ── Typography ── */
+  --font-display: "Geist", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  /* Spacing */
-  --spacing: 0.25rem; /* 4px base multiplier */
+  /* ── Spacing ── */
+  --spacing: 0.25rem;
 
-  /* Border Radii */
-  --radius-sm: 3px;    /* tags small outline */
-  --radius-lg: 10px;   /* cards / inputs / images */
-  --radius-pill: 999px; /* buttons / announcements / toggles / suggestion chips */
-  --radius-full: 999px;
+  /* ── Border Radii ── */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 40px;
+  --radius-full: 9999px;
+  --radius-nav: 9999px;
+  --radius-hero: 40px;
+  --radius-tags: 9999px;
+  --radius-cards: 24px;
+  --radius-images: 20px;
+  --radius-buttons: 9999px;
+  --radius-codeblocks: 16px;
 
-  /* Shadows */
-  --shadow-md: rgba(34, 40, 42, 0.04) 0px 3px 10px 0px; /* Only on Product Preview Cards */
+  /* ── Shadows ── */
+  --shadow-subtle: rgba(255, 255, 255, 0.5) 0px 2px 2px 0px, rgba(0, 0, 0, 0.2) 0px 3px 3px 0px;
+  --shadow-sm: rgba(255, 255, 255, 0.1) 0px 2px 4px 0px inset, rgba(0, 0, 0, 0.5) 0px 4px 8px 0px;
+  --shadow-md: rgba(255, 255, 255, 0.1) 0px 2px 4px 0px inset, rgba(0, 0, 0, 0.5) 0px 4px 8px 0px;
+  --shadow-lg: rgba(255, 255, 255, 0.1) 0px 2px 4px 0px inset, rgba(0, 0, 0, 0.5) 0px 4px 8px 0px;
+  --shadow-glow: rgba(255, 255, 255, 0.5) 0px 2px 2px 0px, rgba(0, 0, 0, 0.2) 0px 3px 3px 0px;
 }
 
 :root {
-  /* Gradients */
-  --gradient-solar-orange: linear-gradient(rgba(250, 249, 247, 0) 2.69%, rgb(255, 240, 222) 24.16%, rgb(255, 174, 83) 56.55%, rgba(255, 174, 83, 0) 98.02%);
-  --gradient-daybreak-horizon: linear-gradient(rgb(242, 241, 237) 42.49%, rgb(213, 223, 224) 93.98%, rgb(229, 255, 148) 104.08%);
-  --gradient-sky-wash: radial-gradient(circle at top, rgba(93, 179, 207, 0.18) 0%, rgba(250, 249, 247, 0) 70%);
+  /* FastHTML palette */
+  --sticker-green: #3cdd8c;
+  --sticker-yellow: #ffc435;
+  --sticker-pink: #e699d9;
+  --periwinkle-violet: #7575f0;
+  --soft-periwinkle: #939eeb;
+  --deep-aubergine: #3a2234;
+  --mint-cream: #d4f7e6;
+  --cotton-candy: #ffccf7;
+  --butter-cream: #ffeecc;
+  --lavender-mist: #e8e8fc;
+  --dusty-mauve: #eddee9;
+  --carbon: #000000;
+  --paper-white: #ffffff;
+  --fog: #f3f3f3;
+  --silver: #e5e7eb;
+  --ash: #cccccc;
+  --graphite: #999999;
+  --slate: #333333;
+
+  /* Legacy */
+  --background: #ffffff;
+  --surface: #f3f3f3;
+  --surface-variant: #e5e7eb;
+  --card: #ffffff;
+  --primary: #000000;
+  --secondary: #7575f0;
+  --accent: #3cdd8c;
+  --text-main: #000000;
+  --muted: #333333;
+  --card-hover: #f3f3f3;
+  --grid-line: rgba(0, 0, 0, 0.04);
+
+  /* Radii */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 40px;
+  --radius-full: 9999px;
+
+  /* Sticker shadow */
+  --shadow-sticker: rgba(255, 255, 255, 0.5) 0px 2px 2px 0px, rgba(0, 0, 0, 0.2) 0px 3px 3px 0px;
+  --shadow-sticker-inset: rgba(255, 255, 255, 0.1) 0px 2px 4px 0px inset, rgba(0, 0, 0, 0.5) 0px 4px 8px 0px;
+  --shadow-sm: rgba(255, 255, 255, 0.5) 0px 2px 2px 0px, rgba(0, 0, 0, 0.2) 0px 3px 3px 0px;
+  --shadow-md: rgba(255, 255, 255, 0.1) 0px 2px 4px 0px inset, rgba(0, 0, 0, 0.5) 0px 4px 8px 0px;
+  --shadow-lg: rgba(255, 255, 255, 0.1) 0px 2px 4px 0px inset, rgba(0, 0, 0, 0.5) 0px 4px 8px 0px;
+  --shadow-glow: rgba(255, 255, 255, 0.5) 0px 2px 2px 0px, rgba(0, 0, 0, 0.2) 0px 3px 3px 0px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
 }
 
 /* ─────────────────────────────────────────
    BASE RESETS
-  ───────────────────────────────────────── */
+   ───────────────────────────────────────── */
 
 html {
   scroll-behavior: smooth;
@@ -73,103 +138,289 @@ html {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
+  background-color: var(--paper-white);
 }
 
 body {
-  background: linear-gradient(180deg, #faf9f7 0%, #fff0de 35%, #ffd2a1 70%, #fff0de 100%) no-repeat center center fixed;
-  background-size: cover;
-  background-color: #fff0de;
-  color: var(--color-ink);
+  background-color: var(--paper-white);
+  color: var(--carbon);
   font-family: var(--font-sans);
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 1.55;
-  letter-spacing: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
   overflow-x: hidden;
+  font-feature-settings: "clig" 0, "liga" 0;
 }
 
 ::selection {
-  background: var(--color-lime-spark);
-  color: var(--color-charcoal);
+  background: var(--sticker-green);
+  color: var(--carbon);
 }
 
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--color-canvas); }
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--fog);
+}
 ::-webkit-scrollbar-thumb {
-  background: var(--color-stone-border);
+  background: var(--ash);
+  border: 2px solid var(--fog);
   border-radius: 999px;
 }
-::-webkit-scrollbar-thumb:hover { background: var(--color-mist-border); }
+::-webkit-scrollbar-thumb:hover {
+  background: var(--graphite);
+}
 
 /* ─────────────────────────────────────────
    TYPOGRAPHY BASE
-   Bold Display Sizing
-  ───────────────────────────────────────── */
+   ───────────────────────────────────────── */
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
-  color: var(--color-pure-black);
-  font-weight: 700 !important; /* Force bold weight for readability */
-  line-height: 1.1;
-  letter-spacing: normal;
-}
-
-h1 {
-  font-size: clamp(2.25rem, 6vw, var(--text-display-lg));
-  line-height: 1.0;
-}
-
-h2 {
-  font-size: clamp(1.75rem, 4vw, var(--text-heading-lg));
-  line-height: 1.07;
-}
-
-h3 {
-  font-size: var(--text-heading);
-  line-height: 1.1;
+  /* No color override — let Tailwind/inline styles control per-section */
+  font-weight: 500;
+  line-height: 1.2;
+  font-feature-settings: "clig" 0, "liga" 0;
 }
 
 p {
-  color: var(--color-ink);
-  font-size: 14px;
-  line-height: 1.6;
-  font-weight: 500;
-  letter-spacing: normal;
-}
-
-code {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  background: var(--color-canvas);
-  border: 1px solid var(--color-hairline);
-  border-radius: 3px;
-  padding: 1px 5px;
-  color: var(--color-ink);
+  /* No color override — let per-section styles control */
+  font-size: 16px;
+  line-height: 1.5;
 }
 
 /* ─────────────────────────────────────────
-   BASE44 CUSTOM UTILITIES
-  ───────────────────────────────────────── */
+   STICKER BUTTON SHADOW UTILITY
+   ───────────────────────────────────────── */
 
-/* Section Dividers */
-.divider-band-orange {
-  width: 100%;
-  height: 160px;
-  background: var(--gradient-solar-orange);
+.shadow-sticker {
+  box-shadow: rgba(255, 255, 255, 0.5) 0px 2px 2px 0px, rgba(0, 0, 0, 0.2) 0px 3px 3px 0px;
 }
 
-.divider-band-daybreak {
-  width: 100%;
-  height: 160px;
-  background: var(--gradient-daybreak-horizon);
+.shadow-sticker-inset {
+  box-shadow: rgba(255, 255, 255, 0.1) 0px 2px 4px 0px inset, rgba(0, 0, 0, 0.5) 0px 4px 8px 0px;
 }
 
-/* Marquee movement */
-@keyframes marquee {
+/* ─────────────────────────────────────────
+   CONFETTI BLOB SHAPES
+   ───────────────────────────────────────── */
+
+.blob {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 9999px;
+  z-index: 0;
+}
+
+.blob-circle {
+  border-radius: 50%;
+}
+
+.blob-pill {
+  border-radius: 9999px;
+}
+
+.blob-rounded {
+  border-radius: 40px;
+}
+
+/* ─────────────────────────────────────────
+   TINTED CARD VARIANTS
+   ───────────────────────────────────────── */
+
+.card-mint   { background-color: var(--mint-cream); }
+.card-candy  { background-color: var(--cotton-candy); }
+.card-butter { background-color: var(--butter-cream); }
+.card-lav    { background-color: var(--lavender-mist); }
+.card-mauve  { background-color: var(--dusty-mauve); }
+.card-fog    { background-color: var(--fog); }
+
+/* ─────────────────────────────────────────
+   PILL BADGE / TAG
+   ───────────────────────────────────────── */
+
+.pill-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* ─────────────────────────────────────────
+   MARQUEE ANIMATION
+   ───────────────────────────────────────── */
+
+@keyframes marquee-rtl {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
 }
 
-.marquee-track {
-  animation: marquee 30s linear infinite;
+@keyframes marquee-ltr {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
 }
+
+.marquee-track-rtl {
+  animation: marquee-rtl 30s linear infinite;
+}
+
+.marquee-track-ltr {
+  animation: marquee-ltr 30s linear infinite;
+}
+
+.marquee-track-rtl:hover,
+.marquee-track-ltr:hover {
+  animation-play-state: paused;
+}
+
+/* ─────────────────────────────────────────
+   GLOW CARD (kept for compat — now tinted)
+   ───────────────────────────────────────── */
+
+.glow-card {
+  position: relative;
+  transition: all 200ms ease;
+  border-radius: 24px;
+}
+
+.glow-card:hover {
+  transform: translateY(-2px);
+}
+
+/* ─────────────────────────────────────────
+   3D MICRO-INTERACTION UTILITIES
+   ───────────────────────────────────────── */
+
+.perspective-container {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+.card-3d {
+  transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1),
+              box-shadow 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.card-3d:hover {
+  transform: perspective(800px) rotateX(-4deg) rotateY(4deg) translateZ(8px) scale(1.01);
+}
+
+.card-3d-left:hover {
+  transform: perspective(800px) rotateX(-4deg) rotateY(-4deg) translateZ(8px) scale(1.01);
+}
+
+/* Magnetic button spring */
+.btn-magnetic {
+  transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: transform;
+}
+
+/* Shimmer sweep on hover */
+@keyframes shimmer {
+  0% { transform: translateX(-100%) skewX(-12deg); }
+  100% { transform: translateX(200%) skewX(-12deg); }
+}
+
+.shimmer-hover {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-hover::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%);
+  transform: translateX(-100%) skewX(-12deg);
+  transition: none;
+  pointer-events: none;
+}
+
+.shimmer-hover:hover::after {
+  animation: shimmer 0.55s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+/* Sticker pop scale on hover */
+.sticker-pop {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.sticker-pop:hover {
+  transform: scale(1.06) rotate(-1.5deg);
+}
+
+/* Parallax wrapper */
+.parallax-slow {
+  will-change: transform;
+}
+
+/* Inset shadow glow for dark cards */
+.card-glow-dark {
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 4px 24px rgba(0,0,0,0.3);
+  transition: box-shadow 0.25s ease, transform 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.card-glow-dark:hover {
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 12px 40px rgba(0,0,0,0.4);
+  transform: translateY(-4px) scale(1.01);
+}
+
+/* 3D number lift */
+@keyframes count-up-bounce {
+  0%   { transform: translateY(6px); opacity: 0; }
+  60%  { transform: translateY(-3px); opacity: 1; }
+  100% { transform: translateY(0px); opacity: 1; }
+}
+
+.number-pop {
+  animation: count-up-bounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ─────────────────────────────────────────
+   GRID BG (kept for compat)
+   ───────────────────────────────────────── */
+
+.grid-bg {
+  background-image: 
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* ─────────────────────────────────────────
+   ACCORDION TRANSITIONS
+   ───────────────────────────────────────── */
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50%       { transform: translateY(-12px) rotate(3deg); }
+}
+
+.float-blob {
+  animation: float-slow 8s ease-in-out infinite;
+}
+
+.float-blob-delay {
+  animation: float-slow 10s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+.float-blob-delay2 {
+  animation: float-slow 12s ease-in-out infinite;
+  animation-delay: 4s;
+}
+
+/* ─────────────────────────────────────────
+   SECTION BAND OVERRIDES
+   ───────────────────────────────────────── */
+
+.band-white    { background-color: var(--paper-white); }
+.band-dark     { background-color: var(--deep-aubergine); }
+.band-violet   { background-color: var(--periwinkle-violet); }
+.band-fog      { background-color: var(--fog); }

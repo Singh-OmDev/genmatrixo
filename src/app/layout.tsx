@@ -7,42 +7,42 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL("https://genmatrixo.com"),
   title: {
-    default: "GenMatrixo — AI Engineering & Custom Software",
+    default: "GenMatrixo — Custom Software, Web Apps & Digital Solutions",
     template: "%s | GenMatrixo",
   },
   description:
-    "GenMatrixo builds serious software. We engineer premium AI systems, enterprise web applications, and high-performance custom infrastructure engineered to perform under load.",
+    "GenMatrixo is a premium digital product studio. We engineer high-performance web applications, mobile apps, SaaS platforms, and bespoke custom software solutions that help businesses scale faster.",
   keywords: [
-    "AI engineering",
     "custom software development",
-    "RAG systems",
-    "enterprise web applications",
-    "AI automation",
+    "web app engineering",
+    "SaaS platform development",
+    "mobile app development",
+    "digital solutions",
+    "tech consulting",
     "GenMatrixo",
-    "Jaipur software company",
-    "machine learning integration",
+    "enterprise software development"
   ],
   openGraph: {
     type: "website",
     locale: "en_IN",
     url: "https://genmatrixo.com",
     siteName: "GenMatrixo",
-    title: "GenMatrixo — AI Engineering & Custom Software",
+    title: "GenMatrixo — Custom Software, Web Apps & Digital Solutions",
     description:
-      "We build serious software. Premium AI systems, enterprise web apps, and custom infrastructure.",
+      "Premium digital product studio. High-performance web apps, mobile apps, SaaS platforms, and bespoke custom software solutions.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "GenMatrixo — AI Engineering & Custom Software",
+        alt: "GenMatrixo — Custom Software, Web Apps & Digital Solutions",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "GenMatrixo — AI Engineering & Custom Software",
-    description: "We build serious software.",
+    title: "GenMatrixo — Custom Software, Web Apps & Digital Solutions",
+    description: "Premium digital product studio building software that scales.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -65,7 +65,7 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -75,7 +75,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <NavBar />
-        <main className="flex flex-col w-full min-h-screen">{children}</main>
+        <main className="flex flex-col w-full min-h-screen" style={{ fontFamily: "'Geist', ui-sans-serif, system-ui, sans-serif" }}>{children}</main>
         <Footer />
       </body>
     </html>

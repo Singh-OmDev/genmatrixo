@@ -1,56 +1,49 @@
 "use client";
 
-import { Users, CheckCircle, Calendar } from "lucide-react";
+import { Users, CheckCircle, Calendar, Heart } from "lucide-react";
 import { FadeUp } from "@/components/motion/FadeUp";
+import { Card3D } from "@/components/ui/Card3D";
 
 const facts = [
-  {
-    icon: Users,
-    label: "Happy Clients",
-    value: "150+",
-  },
-  {
-    icon: CheckCircle,
-    label: "Projects Done",
-    value: "200+",
-  },
-  {
-    icon: Calendar,
-    label: "Years of Experience",
-    value: "4+",
-  },
+  { icon: CheckCircle, label: "Projects Delivered", value: "50+", tint: "#d4f7e6" },
+  { icon: Users,       label: "Businesses Served",  value: "20+", tint: "#ffccf7" },
+  { icon: Calendar,    label: "Years Experience",    value: "4+",  tint: "#ffeecc" },
+  { icon: Heart,       label: "Client Satisfaction", value: "95%", tint: "#e8e8fc" },
 ];
 
 export function CredibilityBar() {
   return (
-    <section className="bg-canvas border-b border-hairline py-12">
-      <div className="max-w-6xl mx-auto px-6">
+    <section className="bg-white py-16">
+      <div className="max-w-[1200px] mx-auto px-6">
         <FadeUp>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
             {facts.map((fact) => {
               const Icon = fact.icon;
               return (
-                <div
+                <Card3D
                   key={fact.label}
-                  className="bg-paper border border-hairline p-6 flex items-center gap-5 shadow-none"
-                  style={{ borderRadius: "10px" }}
+                  intensity={10}
+                  style={{ background: fact.tint, borderRadius: 24 }}
+                  className="shimmer-hover"
                 >
-                  {/* 10px icon container */}
-                  <div 
-                    className="w-12 h-12 bg-canvas-inner border border-hairline flex items-center justify-center text-charcoal shrink-0" 
-                    style={{ borderRadius: "10px" }}
-                  >
-                    <Icon size={20} className="stroke-[1.5]" />
-                  </div>
-                  <div>
-                    <div className="text-[10px] font-sans font-semibold text-graphite uppercase tracking-[0.1em] mb-1">
-                      {fact.label}
+                  <div className="flex flex-col items-center justify-center text-center p-8">
+                    <div
+                      className="w-11 h-11 rounded-full flex items-center justify-center mb-4"
+                      style={{ background: "rgba(0,0,0,0.08)" }}
+                    >
+                      <Icon size={18} className="text-black stroke-[1.5]" />
                     </div>
-                    <div className="text-2xl font-display font-normal text-pure-black leading-none tracking-tight">
+                    <div
+                      className="font-display font-medium text-black leading-none mb-2 number-pop"
+                      style={{ fontSize: 42, letterSpacing: "-0.03em" }}
+                    >
                       {fact.value}
                     </div>
+                    <div className="text-[12px] font-medium text-black/50 uppercase tracking-wider">
+                      {fact.label}
+                    </div>
                   </div>
-                </div>
+                </Card3D>
               );
             })}
           </div>

@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 interface ButtonProps {
   children: React.ReactNode;
-  variant?: "primary" | "secondary" | "secondary-orange" | "secondary-lime" | "ghost";
+  variant?: "primary" | "secondary" | "ghost" | "outline";
   size?: "sm" | "md" | "lg";
   href?: string;
   onClick?: () => void;
@@ -16,26 +16,30 @@ interface ButtonProps {
   external?: boolean;
 }
 
+/* Base: pill shape, no color */
 const baseStyles =
-  "inline-flex items-center justify-center gap-2 font-sans font-medium tracking-[0.1em] rounded-pill transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-bolt cursor-pointer select-none disabled:opacity-40 disabled:cursor-not-allowed";
+  "inline-flex items-center justify-center gap-2 font-sans font-medium rounded-[9999px] transition-all duration-200 cursor-pointer select-none disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-white";
 
 const variants = {
+  /* Black filled pill — primary action is always black */
   primary:
-    "bg-lime-spark text-charcoal border border-lime-spark hover:bg-[#d5eb9b] hover:border-[#d5eb9b] font-medium shadow-none",
+    "bg-black text-white hover:bg-neutral-800 active:scale-[0.98]" +
+    " shadow-[rgba(255,255,255,0.5)_0px_2px_2px_0px,rgba(0,0,0,0.2)_0px_3px_3px_0px]",
+  /* White outlined pill — secondary / ghost action */
   secondary:
-    "bg-transparent text-ink border-2 border-stone-border hover:border-graphite hover:text-pure-black",
-  "secondary-orange":
-    "bg-transparent text-ink border-2 border-ember-outline hover:bg-ember-outline hover:text-paper",
-  "secondary-lime":
-    "bg-transparent text-ink border-2 border-lime-bolt hover:bg-lime-bolt hover:text-charcoal",
+    "bg-white text-black border border-black/20 hover:border-black/60 active:scale-[0.98]" +
+    " shadow-[rgba(255,255,255,0.5)_0px_2px_2px_0px,rgba(0,0,0,0.2)_0px_3px_3px_0px]",
+  outline:
+    "bg-white text-black border border-black hover:bg-[#f3f3f3] active:scale-[0.98]" +
+    " shadow-[rgba(255,255,255,0.5)_0px_2px_2px_0px,rgba(0,0,0,0.2)_0px_3px_3px_0px]",
   ghost:
-    "bg-transparent text-ink hover:bg-hairline",
+    "bg-transparent text-black/70 hover:text-black hover:bg-black/5",
 };
 
 const sizes = {
-  sm: "px-4 py-2 text-[12px] gap-1.5",
-  md: "px-6 py-3 text-[14px]",
-  lg: "px-8 py-3.5 text-[16px]",
+  sm: "px-4 py-2 text-[13px] gap-1.5",
+  md: "px-6 py-2 text-sm",
+  lg: "px-7 py-2.5 text-[16px]",
 };
 
 export function Button({
@@ -71,6 +75,7 @@ export function Button({
       onClick={onClick}
       disabled={disabled}
       className={classes}
+      whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.98 }}
     >
       {children}

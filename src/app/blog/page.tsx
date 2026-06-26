@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import { ContactClient } from "./ContactClient";
+import { BlogClient } from "./BlogClient";
 import { FadeUp } from "@/components/motion/FadeUp";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Connect with our Engineers | GenMatrixo",
+  title: "Insights & Technical Blueprints | GenMatrixo",
   description:
-    "Get in touch with GenMatrixo. Schedule a 30-minute discovery call or send us a project inquiry to discuss custom web, mobile, or SaaS development.",
+    "Read modern software engineering posts, technical sitemaps, system design ideas, and optimizations directly from the GenMatrixo team.",
 };
 
-export default function ContactPage() {
+export default function BlogPage() {
   return (
     <>
       {/* Page Header */}
@@ -19,22 +19,22 @@ export default function ContactPage() {
         <div className="max-w-6xl mx-auto px-6 relative z-10">
           <FadeUp>
             <div className="text-xs font-sans font-semibold uppercase tracking-widest text-primary mb-3">
-              <Link href="/" className="hover:text-text-main">Home</Link> / Contact
+              <Link href="/" className="hover:text-text-main">Home</Link> / Insights
             </div>
             <h1 className="text-text-main font-display font-bold text-4xl sm:text-5xl md:text-6xl max-w-3xl leading-tight mb-6">
-              Connect with our engineers
+              Insights & Blueprints
             </h1>
             <p className="text-muted font-sans text-base max-w-2xl leading-relaxed">
-              Have a hard engineering challenge or a custom product roadmap to map out? Connect with our team of builders.
+              Technical articles, sitemaps, and system optimization write-ups compiled by our principal development division.
             </p>
           </FadeUp>
         </div>
       </section>
 
-      {/* Main Form/Scheduler Split Area */}
+      {/* Main Blog Area */}
       <section className="bg-background py-16 lg:py-24">
         <div className="max-w-6xl mx-auto px-6">
-          <ContactClient />
+          <BlogClient />
         </div>
       </section>
     </>

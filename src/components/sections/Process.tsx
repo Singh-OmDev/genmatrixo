@@ -1,68 +1,76 @@
 "use client";
 
-import { 
-  Building, 
-  Heart, 
-  Utensils, 
-  ShoppingCart, 
-  Dumbbell, 
-  Key, 
-  Plane, 
-  Scissors, 
-  GraduationCap, 
-  HeartHandshake, 
-  Factory, 
-  Briefcase 
-} from "lucide-react";
+import { Search, PenTool, LayoutTemplate, Code2, Rocket, HeartHandshake } from "lucide-react";
 import { FadeUp } from "@/components/motion/FadeUp";
 import { StaggerContainer, StaggerItem } from "@/components/motion/StaggerContainer";
+import { Card3D } from "@/components/ui/Card3D";
 
-const industries = [
-  { icon: Building, title: "Real Estate" },
-  { icon: Heart, title: "Hospital" },
-  { icon: Utensils, title: "Restaurant" },
-  { icon: ShoppingCart, title: "E-commerce" },
-  { icon: Dumbbell, title: "Fitness & Gym" },
-  { icon: Key, title: "Hotel" },
-  { icon: Plane, title: "Travel & Tourism" },
-  { icon: Scissors, title: "Salon & Spa" },
-  { icon: GraduationCap, title: "Education" },
-  { icon: HeartHandshake, title: "NGO & Charity" },
-  { icon: Factory, title: "Manufacturing" },
-  { icon: Briefcase, title: "Other" },
+const tints = ["#d4f7e6", "#e8e8fc", "#ffeecc", "#ffccf7", "#eddee9", "#f3f3f3"];
+
+const steps = [
+  { phase: "01", title: "Discovery",   description: "Identify project goals, user personas, and technical requirements through thorough stakeholder consulting.",        icon: Search },
+  { phase: "02", title: "Planning",    description: "Formulate product specifications, user story maps, architecture designs, and development schedules.",                icon: PenTool },
+  { phase: "03", title: "Design",      description: "Develop high-fidelity interactive prototypes, responsive layout frameworks, and digital brand design systems.",      icon: LayoutTemplate },
+  { phase: "04", title: "Development", description: "Build clean, modular, and optimized front-ends and back-ends using modern frameworks and testing suites.",           icon: Code2 },
+  { phase: "05", title: "Deployment",  description: "Orchestrate staging runs, perform penetration audits, and launch production containers to secure cloud grids.",     icon: Rocket },
+  { phase: "06", title: "Support",     description: "Provide continuous feature updates, security patches, database optimizations, and SLA-backed uptime monitoring.", icon: HeartHandshake },
 ];
 
 export function Process() {
   return (
-    <section id="industries" className="bg-canvas border-b border-hairline py-20 lg:py-28">
-      <div className="max-w-6xl mx-auto px-6">
-        {/* Title Block */}
+    <section id="process" className="bg-white py-24 lg:py-32">
+      <div className="max-w-[1200px] mx-auto px-6">
         <FadeUp>
           <div className="text-center mb-16">
-            <span className="text-xs font-sans uppercase tracking-[0.1em] text-graphite block mb-3">
-              Industries We Serve
+            <span
+              className="inline-block text-[11px] font-medium tracking-[0.18em] uppercase mb-4 px-3 py-1 rounded-full text-black/50"
+              style={{ background: "#f3f3f3" }}
+            >
+              How We Work
             </span>
-            <h2 className="text-pure-black font-display font-normal max-w-2xl mx-auto tracking-tight leading-tight">
-              We build custom digital solutions to simplify operations and boost growth.
+            <h2
+              className="font-display font-medium text-black mx-auto mb-4"
+              style={{ fontSize: "clamp(32px, 4.5vw, 54px)", lineHeight: 1.22, letterSpacing: "-0.5px", maxWidth: 600 }}
+            >
+              Our Development Process
             </h2>
+            <p className="text-black/50 max-w-md mx-auto" style={{ fontSize: 16, lineHeight: 1.6 }}>
+              A structured lifecycle designed to build reliable, high-performance software with zero engineering friction.
+            </p>
           </div>
         </FadeUp>
 
-        {/* Industries Grid */}
-        <StaggerContainer className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {industries.map((ind) => {
-            const Icon = ind.icon;
+        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {steps.map((step, idx) => {
+            const Icon = step.icon;
             return (
-              <StaggerItem key={ind.title}>
-                <div
-                  className="bg-paper border border-hairline p-6 flex flex-col justify-between h-[140px] shadow-none hover:border-stone-border transition-colors"
-                  style={{ borderRadius: "10px" }}
+              <StaggerItem key={step.phase}>
+                <Card3D
+                  className="h-full shimmer-hover"
+                  style={{ background: tints[idx % tints.length], borderRadius: 24, padding: 32 }}
+                  intensity={7}
                 >
-                  <Icon size={20} className="text-graphite stroke-[1.5]" />
-                  <h4 className="text-sm font-sans font-semibold text-pure-black tracking-[0.1em] uppercase">
-                    {ind.title}
-                  </h4>
-                </div>
+                  <div className="flex items-center gap-3 mb-6">
+                    <span
+                      className="sticker-pop inline-flex items-center justify-center w-9 h-9 rounded-full font-mono font-bold text-[13px]"
+                      style={{ background: "#3cdd8c", color: "#000" }}
+                    >
+                      {step.phase}
+                    </span>
+                    <div
+                      className="w-10 h-10 rounded-[12px] flex items-center justify-center"
+                      style={{ background: "rgba(0,0,0,0.07)" }}
+                    >
+                      <Icon size={17} className="text-black stroke-[1.5]" />
+                    </div>
+                  </div>
+                  <h3 className="font-display font-medium text-black mb-3" style={{ fontSize: 17, lineHeight: 1.35 }}>
+                    {step.title}
+                  </h3>
+                  <p className="font-sans text-black/55 leading-relaxed" style={{ fontSize: 14 }}>
+                    {step.description}
+                  </p>
+                </Card3D>
               </StaggerItem>
             );
           })}
