@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { NavBar } from "@/components/layout/NavBar";
 import { Footer } from "@/components/layout/Footer";
+import { SmoothScrollProvider } from "@/components/animation/SmoothScrollProvider";
 import { organizationSchema } from "@/lib/structuredData";
 import "./globals.css";
 
@@ -74,9 +75,11 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        <NavBar />
-        <main className="flex flex-col w-full min-h-screen" style={{ fontFamily: "'Geist', ui-sans-serif, system-ui, sans-serif" }}>{children}</main>
-        <Footer />
+        <SmoothScrollProvider>
+          <NavBar />
+          <main className="flex flex-col w-full min-h-screen" style={{ fontFamily: "'Geist', ui-sans-serif, system-ui, sans-serif" }}>{children}</main>
+          <Footer />
+        </SmoothScrollProvider>
       </body>
     </html>
   );

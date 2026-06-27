@@ -1,6 +1,9 @@
-import { FadeUp } from "@/components/motion/FadeUp";
-import { StaggerContainer, StaggerItem } from "@/components/motion/StaggerContainer";
+"use client";
+
+import { useEffect, useRef } from "react";
 import { Card3D } from "@/components/ui/Card3D";
+import { SplitText } from "@/components/ui/SplitText";
+import { gsap, ScrollTrigger } from "@/lib/gsapInit";
 
 const testimonials = [
   {
@@ -22,35 +25,69 @@ const testimonials = [
 ];
 
 export function Testimonials() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Respect prefers-reduced-motion
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) return;
+
+    const el = containerRef.current;
+    if (!el) return;
+
+    const cards = el.querySelectorAll(".testimonial-card-wrapper");
+    if (cards.length === 0) return;
+
+    gsap.set(cards, { opacity: 0, y: 35 });
+
+    const trigger = ScrollTrigger.create({
+      trigger: el,
+      start: "top 80%",
+      onEnter: () => {
+        gsap.to(cards, {
+          opacity: 1,
+          y: 0,
+          duration: 0.65,
+          stagger: 0.12,
+          ease: "power2.out",
+          overwrite: "auto",
+        });
+      },
+    });
+
+    return () => {
+      trigger.kill();
+    };
+  }, []);
+
   return (
     <section id="testimonials" className="py-24 lg:py-32" style={{ background: "#3a2234" }}>
-      <div className="max-w-[1200px] mx-auto px-6">
-        <FadeUp>
-          <div className="mb-16">
-            <span
-              className="inline-block text-[11px] font-medium tracking-[0.18em] uppercase mb-4 px-3 py-1 rounded-full"
-              style={{ background: "rgba(255,255,255,0.1)", color: "#939eeb" }}
-            >
-              Testimonials
-            </span>
-            <h2
-              className="font-display font-medium"
-              style={{
-                fontSize: "clamp(32px, 4.5vw, 54px)",
-                lineHeight: 1.22,
-                letterSpacing: "-0.5px",
-                maxWidth: 500,
-                color: "#ffffff",   /* explicit white on dark aubergine */
-              }}
-            >
-              Trusted by Product Leaders
-            </h2>
-          </div>
-        </FadeUp>
+      <div ref={containerRef} className="max-w-[1200px] mx-auto px-6">
+        
+        <div className="mb-16">
+          <span
+            className="inline-block text-[11px] font-medium tracking-[0.18em] uppercase mb-4 px-3 py-1 rounded-full"
+            style={{ background: "rgba(255,255,255,0.1)", color: "#939eeb" }}
+          >
+            Testimonials
+          </span>
+          <h2
+            className="font-display font-medium"
+            style={{
+              fontSize: "clamp(32px, 4.5vw, 54px)",
+              lineHeight: 1.22,
+              letterSpacing: "-0.5px",
+              maxWidth: 500,
+              color: "#ffffff",
+            }}
+          >
+            <SplitText text="Trusted by Product Leaders" type="words" triggerSelector="#testimonials" />
+          </h2>
+        </div>
 
-        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {testimonials.map((t) => (
-            <StaggerItem key={t.name}>
+            <div key={t.name} className="testimonial-card-wrapper">
               <Card3D
                 className="h-full shimmer-hover"
                 style={{ background: t.tint, borderRadius: 24, padding: 32 }}
@@ -79,10 +116,11 @@ export function Testimonials() {
                   </div>
                 </div>
               </Card3D>
-            </StaggerItem>
+            </div>
           ))}
-        </StaggerContainer>
+        </div>
       </div>
     </section>
   );
 }
+

@@ -1,10 +1,11 @@
 "use client";
 
-import { Cpu, ShieldCheck, ArrowRight, TrendingUp } from "lucide-react";
-import { FadeUp } from "@/components/motion/FadeUp";
-import { StaggerContainer, StaggerItem } from "@/components/motion/StaggerContainer";
+import { useEffect, useRef } from "react";
+import { Cpu, ShieldCheck, ArrowRight, TrendingUp, Box } from "lucide-react";
 import { Card3D } from "@/components/ui/Card3D";
 import Link from "next/link";
+import { SplitText } from "@/components/ui/SplitText";
+import { gsap, ScrollTrigger } from "@/lib/gsapInit";
 
 const projects = [
   {
@@ -27,92 +28,164 @@ const projects = [
     icon: ShieldCheck,
     tint: "#d4f7e6",
   },
+  {
+    title: "SwiftCart E-Commerce Hub",
+    category: "High-Traffic Retail SaaS",
+    challenge: "High cart abandonment rates due to slow page loads and out-of-sync inventory databases during flash sales.",
+    solution: "Designed a globally distributed Next.js storefront utilizing serverless Edge handlers and Stripe webhook processing.",
+    results: "34% checkout conversion increase, 99.98% platform reliability, and sub-100ms API response times globally.",
+    tech: ["Next.js", "Stripe", "PostgreSQL", "TailwindCSS", "Edge Functions"],
+    icon: Box,
+    tint: "#ffeecc",
+  },
 ];
 
 export function CaseStudies() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Respect prefers-reduced-motion
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) return;
+
+    // Only apply sticky stack scroll animations on desktop screens (>=1024px)
+    if (window.innerWidth < 1024) return;
+
+    const cards = containerRef.current?.querySelectorAll(".case-study-card");
+    if (!cards || cards.length === 0) return;
+
+    const animations: gsap.core.Tween[] = [];
+
+    cards.forEach((card, idx) => {
+      const cardInner = card.querySelector(".card-inner");
+      if (!cardInner) return;
+
+      // Don't animate the final card in the stack
+      if (idx === cards.length - 1) return;
+
+      const nextCard = cards[idx + 1];
+
+      const anim = gsap.to(cardInner, {
+        scale: 0.92,
+        opacity: 0.55,
+        filter: "blur(4px)",
+        scrollTrigger: {
+          trigger: nextCard,
+          start: "top 85%", // Starts scaling down when the next card enters the screen
+          end: "top 35%",   // Finishes when the next card is settled
+          scrub: true,
+        },
+      });
+      animations.push(anim);
+    });
+
+    return () => {
+      animations.forEach((anim) => anim.scrollTrigger?.kill());
+    };
+  }, []);
+
   return (
     <section id="case-studies" className="bg-white py-24 lg:py-32">
-      <div className="max-w-[1200px] mx-auto px-6">
-        <FadeUp>
-          <div className="flex items-start justify-between mb-16 flex-wrap gap-6">
-            <div>
-              <span
-                className="inline-block text-[11px] font-medium tracking-[0.18em] uppercase mb-4 px-3 py-1 rounded-full text-black/50"
-                style={{ background: "#f3f3f3" }}
-              >
-                Featured Case Studies
-              </span>
-              <h2
-                className="font-display font-medium text-black max-w-xl"
-                style={{ fontSize: "clamp(28px, 4vw, 48px)", lineHeight: 1.22, letterSpacing: "-0.4px" }}
-              >
-                Real-world impact through dedicated software engineering.
-              </h2>
-            </div>
-            <Link href="/projects" className="inline-flex items-center gap-1.5 text-[13px] font-medium text-black/50 hover:text-black transition-colors self-end mb-1 group">
+      <div ref={containerRef} className="max-w-[1200px] mx-auto px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+          
+          {/* Left Column: Sticky Header details */}
+          <div className="lg:col-span-4 lg:sticky lg:top-32 flex flex-col items-start">
+            <span
+              className="inline-block text-[11px] font-medium tracking-[0.18em] uppercase mb-4 px-3 py-1 rounded-full text-black/50"
+              style={{ background: "#f3f3f3" }}
+            >
+              Featured Case Studies
+            </span>
+            <h2
+              className="font-display font-medium text-black mb-8"
+              style={{ fontSize: "clamp(28px, 4vw, 44px)", lineHeight: 1.2, letterSpacing: "-0.4px" }}
+            >
+              <SplitText
+                text="Real-world impact through dedicated software engineering."
+                type="words"
+                triggerSelector="#case-studies"
+              />
+            </h2>
+            <Link
+              href="/projects"
+              className="inline-flex items-center gap-1.5 text-[14px] font-medium text-black/50 hover:text-black transition-colors group"
+            >
               Browse All Cases
-              <ArrowRight size={14} className="transform group-hover:translate-x-1 transition-transform" />
+              <ArrowRight size={15} className="transform group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
-        </FadeUp>
 
-        <StaggerContainer className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          {projects.map((project) => {
-            const Icon = project.icon;
-            return (
-              <StaggerItem key={project.title}>
-                <Card3D
-                  className="h-full shimmer-hover"
-                  style={{ background: project.tint, borderRadius: 24, padding: 32 }}
-                  intensity={5}
+          {/* Right Column: Stacked Cards list */}
+          <div className="lg:col-span-8 flex flex-col gap-8 relative w-full">
+            {projects.map((project, idx) => {
+              const Icon = project.icon;
+              return (
+                <div
+                  key={project.title}
+                  className="case-study-card lg:sticky w-full"
+                  style={{
+                    top: `calc(100px + ${idx * 40}px)`,
+                    paddingBottom: idx < projects.length - 1 ? `${(projects.length - 1 - idx) * 16}px` : "0px",
+                  }}
                 >
-                  <div className="flex items-center gap-3.5 mb-6">
-                    <div className="w-11 h-11 rounded-[12px] flex items-center justify-center shrink-0" style={{ background: "rgba(0,0,0,0.07)" }}>
-                      <Icon size={18} className="text-black stroke-[1.5]" />
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-medium text-black/40 tracking-widest uppercase block">{project.category}</span>
-                      <h3 className="font-display font-medium text-black leading-tight mt-0.5" style={{ fontSize: 18 }}>{project.title}</h3>
-                    </div>
-                  </div>
+                  <div className="card-inner origin-bottom">
+                    <Card3D
+                      className="w-full shimmer-hover"
+                      style={{ background: project.tint, borderRadius: 24, padding: 32 }}
+                      intensity={4}
+                    >
+                      <div className="flex items-center gap-3.5 mb-6">
+                        <div className="w-11 h-11 rounded-[12px] flex items-center justify-center shrink-0" style={{ background: "rgba(0,0,0,0.07)" }}>
+                          <Icon size={18} className="text-black stroke-[1.5]" />
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-medium text-black/40 tracking-widest uppercase block">{project.category}</span>
+                          <h3 className="font-display font-medium text-black leading-tight mt-0.5" style={{ fontSize: 18 }}>{project.title}</h3>
+                        </div>
+                      </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
-                    <div>
-                      <span className="text-[10px] font-medium text-black/40 uppercase tracking-wider block mb-1.5">Challenge</span>
-                      <p className="text-[13px] text-black/60 leading-relaxed">{project.challenge}</p>
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-medium text-black/40 uppercase tracking-wider block mb-1.5">Solution</span>
-                      <p className="text-[13px] text-black/60 leading-relaxed">{project.solution}</p>
-                    </div>
-                  </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                        <div>
+                          <span className="text-[10px] font-medium text-black/40 uppercase tracking-wider block mb-1.5">Challenge</span>
+                          <p className="text-[13px] text-black/60 leading-relaxed">{project.challenge}</p>
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-medium text-black/40 uppercase tracking-wider block mb-1.5">Solution</span>
+                          <p className="text-[13px] text-black/60 leading-relaxed">{project.solution}</p>
+                        </div>
+                      </div>
 
-                  <div className="p-4 mb-5" style={{ background: "rgba(0,0,0,0.05)", borderRadius: 16 }}>
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <TrendingUp size={13} className="text-black/50" />
-                      <span className="text-[10px] font-bold text-black/50 uppercase tracking-widest">Results & Impact</span>
-                    </div>
-                    <p className="text-[13px] text-black leading-relaxed">{project.results}</p>
-                  </div>
+                      <div className="p-4 mb-5" style={{ background: "rgba(0,0,0,0.05)", borderRadius: 16 }}>
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <TrendingUp size={13} className="text-black/50" />
+                          <span className="text-[10px] font-bold text-black/50 uppercase tracking-widest">Results & Impact</span>
+                        </div>
+                        <p className="text-[13px] text-black leading-relaxed">{project.results}</p>
+                      </div>
 
-                  <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-black/10 mt-auto">
-                    <div className="flex flex-wrap gap-1.5">
-                      {project.tech.map((t) => (
-                        <span key={t} className="sticker-pop text-[11px] font-medium text-black px-3 py-1 rounded-[9999px]" style={{ background: "rgba(0,0,0,0.08)" }}>
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                    <Link href="/projects" className="inline-flex items-center gap-1 text-[12px] font-medium text-black/50 hover:text-black transition-colors">
-                      Case details <ArrowRight size={12} />
-                    </Link>
+                      <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-black/10 mt-auto">
+                        <div className="flex flex-wrap gap-1.5">
+                          {project.tech.map((t) => (
+                            <span key={t} className="sticker-pop text-[11px] font-medium text-black px-3 py-1 rounded-[9999px]" style={{ background: "rgba(0,0,0,0.08)" }}>
+                              {t}
+                            </span>
+                          ))}
+                        </div>
+                        <Link href="/projects" className="inline-flex items-center gap-1 text-[12px] font-medium text-black/50 hover:text-black transition-colors">
+                          Case details <ArrowRight size={12} />
+                        </Link>
+                      </div>
+                    </Card3D>
                   </div>
-                </Card3D>
-              </StaggerItem>
-            );
-          })}
-        </StaggerContainer>
+                </div>
+              );
+            })}
+          </div>
+
+        </div>
       </div>
     </section>
   );
 }
+

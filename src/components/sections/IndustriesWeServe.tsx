@@ -1,9 +1,10 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { Building2, Heart, GraduationCap, ShoppingCart, Landmark, Plane } from "lucide-react";
-import { FadeUp } from "@/components/motion/FadeUp";
-import { StaggerContainer, StaggerItem } from "@/components/motion/StaggerContainer";
 import { Card3D } from "@/components/ui/Card3D";
+import { SplitText } from "@/components/ui/SplitText";
+import { gsap, ScrollTrigger } from "@/lib/gsapInit";
 
 const industries = [
   { icon: Heart,         title: "Healthcare",  desc: "HIPAA-compliant platforms, telemetry integrations, and scheduling workflows." },
@@ -15,13 +16,48 @@ const industries = [
 ];
 
 export function IndustriesWeServe() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Respect prefers-reduced-motion
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) return;
+
+    const el = containerRef.current;
+    if (!el) return;
+
+    const cards = el.querySelectorAll(".industry-card-wrapper");
+    if (cards.length === 0) return;
+
+    gsap.set(cards, { opacity: 0, x: 25 });
+
+    const trigger = ScrollTrigger.create({
+      trigger: el,
+      start: "top 80%",
+      onEnter: () => {
+        gsap.to(cards, {
+          opacity: 1,
+          x: 0,
+          duration: 0.6,
+          stagger: 0.08,
+          ease: "power2.out",
+          overwrite: "auto",
+        });
+      },
+    });
+
+    return () => {
+      trigger.kill();
+    };
+  }, []);
+
   return (
     <section id="industries" className="py-24 lg:py-32" style={{ background: "#7575f0" }}>
-      <div className="max-w-[1200px] mx-auto px-6">
+      <div ref={containerRef} className="max-w-[1200px] mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
 
-          {/* Left: title — BLACK text on violet (fastht.ml spec) */}
-          <FadeUp className="lg:col-span-4">
+          {/* Left: title — BLACK text on violet */}
+          <div className="lg:col-span-4">
             <span
               className="inline-block text-[11px] font-medium tracking-[0.18em] uppercase mb-5 px-3 py-1 rounded-full"
               style={{ background: "rgba(255,255,255,0.28)", color: "#000" }}
@@ -34,23 +70,23 @@ export function IndustriesWeServe() {
                 fontSize: "clamp(32px, 4.5vw, 54px)",
                 lineHeight: 1.18,
                 letterSpacing: "-0.5px",
-                color: "#000000",  /* black on violet per fastht.ml */
+                color: "#000000",
               }}
             >
-              Industries We Serve
+              <SplitText text="Industries We Serve" type="words" triggerSelector="#industries" />
             </h2>
             <p style={{ fontSize: 16, lineHeight: 1.6, color: "#000", opacity: 0.65, maxWidth: 340 }}>
               We design and build bespoke software tailored to solve industry-specific operational challenges.
             </p>
-          </FadeUp>
+          </div>
 
           {/* Right: 3D white cards on violet */}
           <div className="lg:col-span-8">
-            <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {industries.map((ind) => {
                 const Icon = ind.icon;
                 return (
-                  <StaggerItem key={ind.title}>
+                  <div key={ind.title} className="industry-card-wrapper">
                     <Card3D
                       className="shimmer-hover"
                       style={{ background: "#ffffff", borderRadius: 16, padding: 24, display: "flex", alignItems: "flex-start", gap: 16 }}
@@ -71,10 +107,10 @@ export function IndustriesWeServe() {
                         </p>
                       </div>
                     </Card3D>
-                  </StaggerItem>
+                  </div>
                 );
               })}
-            </StaggerContainer>
+            </div>
           </div>
 
         </div>
@@ -82,3 +118,4 @@ export function IndustriesWeServe() {
     </section>
   );
 }
+

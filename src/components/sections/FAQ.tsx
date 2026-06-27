@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Minus } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { FadeUp } from "@/components/motion/FadeUp";
+import { useState, useRef, useEffect } from "react";
+import { Plus } from "lucide-react";
+import { gsap, ScrollTrigger } from "@/lib/gsapInit";
 
 const faqs = [
   { q: "What types of services does GenMatrixo offer?",              a: "We engineer premium digital products across web development (Next.js runtimes), native/cross-platform mobile apps, multi-tenant SaaS platforms, custom databases, UI/UX designs, and strategic technology consulting." },
@@ -15,6 +14,31 @@ const faqs = [
 ];
 
 function AccordionItem({ q, a, open, onToggle }: { q: string; a: string; open: boolean; onToggle: () => void }) {
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = panelRef.current;
+    if (!el) return;
+
+    if (open) {
+      gsap.to(el, {
+        height: "auto",
+        opacity: 1,
+        duration: 0.35,
+        ease: "power2.out",
+        overwrite: "auto",
+      });
+    } else {
+      gsap.to(el, {
+        height: 0,
+        opacity: 0,
+        duration: 0.25,
+        ease: "power2.inOut",
+        overwrite: "auto",
+      });
+    }
+  }, [open]);
+
   return (
     <div
       className="mb-3 last:mb-0 shimmer-hover"
@@ -37,35 +61,62 @@ function AccordionItem({ q, a, open, onToggle }: { q: string; a: string; open: b
           <Plus size={14} strokeWidth={2} />
         </span>
       </button>
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-            className="overflow-hidden"
-          >
-            <p className="px-6 pb-5 text-black/55 leading-relaxed" style={{ fontSize: 14, lineHeight: 1.65 }}>
-              {a}
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div
+        ref={panelRef}
+        className="overflow-hidden"
+        style={{ height: 0, opacity: 0 }}
+      >
+        <p className="px-6 pb-5 text-black/55 leading-relaxed" style={{ fontSize: 14, lineHeight: 1.65 }}>
+          {a}
+        </p>
+      </div>
     </div>
   );
 }
 
 export function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) return;
+
+    const container = containerRef.current;
+    if (!container) return;
+
+    const leftCol = container.querySelector(".faq-left");
+    const rightCol = container.querySelector(".faq-right");
+
+    gsap.set([leftCol, rightCol], { opacity: 0, y: 30 });
+
+    const trigger = ScrollTrigger.create({
+      trigger: container,
+      start: "top 80%",
+      onEnter: () => {
+        gsap.to([leftCol, rightCol], {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          stagger: 0.15,
+          ease: "power2.out",
+          overwrite: "auto",
+        });
+      },
+    });
+
+    return () => {
+      trigger.kill();
+    };
+  }, []);
 
   return (
     <section id="faq" className="py-24 lg:py-32" style={{ background: "#7575f0" }}>
-      <div className="max-w-[1200px] mx-auto px-6">
+      <div ref={containerRef} className="max-w-[1200px] mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
 
-          {/* Left: BLACK text on violet (fastht.ml) */}
-          <FadeUp className="lg:col-span-4">
+          {/* Left: title column */}
+          <div className="faq-left lg:col-span-4">
             <span
               className="inline-block text-[11px] font-medium tracking-[0.18em] uppercase mb-5 px-3 py-1 rounded-full"
               style={{ background: "rgba(255,255,255,0.28)", color: "#000" }}
@@ -78,7 +129,7 @@ export function FAQ() {
                 fontSize: "clamp(32px, 4.5vw, 54px)",
                 lineHeight: 1.18,
                 letterSpacing: "-0.5px",
-                color: "#000000",   /* black on violet */
+                color: "#000000",
               }}
             >
               Questions?{" "}
@@ -87,10 +138,10 @@ export function FAQ() {
             <p style={{ fontSize: 16, lineHeight: 1.6, color: "#000", opacity: 0.65, maxWidth: 300 }}>
               Common queries regarding our development lifecycle, methodologies, and engineering agreements.
             </p>
-          </FadeUp>
+          </div>
 
           {/* Right: animated accordion stack */}
-          <FadeUp delay={0.1} className="lg:col-span-8">
+          <div className="faq-right lg:col-span-8">
             <div>
               {faqs.map((f, i) => (
                 <AccordionItem
@@ -102,10 +153,11 @@ export function FAQ() {
                 />
               ))}
             </div>
-          </FadeUp>
+          </div>
 
         </div>
       </div>
     </section>
   );
 }
+

@@ -45,19 +45,21 @@ export function NavBar() {
             }}
           >
             {/* Logo */}
-            <Magnetic strength={0.25}>
-              <Link href="/" className="flex items-center gap-2 shrink-0 mr-2">
-                <span
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[11px] font-bold shrink-0 hover:scale-110 transition-transform"
-                  style={{ background: "#000" }}
-                >
-                  G
-                </span>
-                <span className="font-display font-semibold text-[15px] text-black tracking-tight hidden sm:inline">
-                  GenMatrixo
-                </span>
-              </Link>
-            </Magnetic>
+            <Link href="/" className="flex items-center gap-2 shrink-0 mr-2">
+              <Magnetic strength={0.25}>
+                <div className="flex items-center gap-2">
+                  <span
+                    className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[11px] font-bold shrink-0 hover:scale-110 transition-transform"
+                    style={{ background: "#000" }}
+                  >
+                    G
+                  </span>
+                  <span className="font-display font-semibold text-[15px] text-black tracking-tight hidden sm:inline">
+                    GenMatrixo
+                  </span>
+                </div>
+              </Magnetic>
+            </Link>
 
             {/* Spacer */}
             <div className="flex-1" />
@@ -106,18 +108,22 @@ export function NavBar() {
             </div>
 
             {/* CTA */}
-            <Magnetic strength={0.35}>
-              <Link
-                href="/contact"
-                className="hidden md:inline-flex items-center gap-1.5 ml-2 px-5 py-2 text-[14px] font-medium text-white rounded-[9999px] shimmer-hover transition-all duration-150 hover:bg-neutral-800 active:scale-[0.97] shrink-0"
-                style={{
-                  background: "#000",
-                  boxShadow: "rgba(255,255,255,0.5) 0px 2px 2px 0px, rgba(0,0,0,0.2) 0px 3px 3px 0px",
-                }}
-              >
-                Start Project
-              </Link>
-            </Magnetic>
+            <Link
+              href="/contact"
+              className="hidden md:inline-flex items-center shrink-0"
+            >
+              <Magnetic strength={0.35}>
+                <span
+                  className="inline-flex items-center gap-1.5 ml-2 px-5 py-2 text-[14px] font-medium text-white rounded-[9999px] shimmer-hover transition-all duration-150 hover:bg-neutral-800 active:scale-[0.97]"
+                  style={{
+                    background: "#000",
+                    boxShadow: "rgba(255,255,255,0.5) 0px 2px 2px 0px, rgba(0,0,0,0.2) 0px 3px 3px 0px",
+                  }}
+                >
+                  Start Project
+                </span>
+              </Magnetic>
+            </Link>
 
             {/* Mobile hamburger */}
             <button

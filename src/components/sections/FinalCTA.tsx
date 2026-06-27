@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Mail, Clock, Calendar, CheckCircle2, ChevronLeft, ChevronRight, Video, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FadeUp } from "@/components/motion/FadeUp";
 import { Button } from "@/components/ui/Button";
+import { SplitText } from "@/components/ui/SplitText";
+import { gsap, ScrollTrigger } from "@/lib/gsapInit";
 
 const timeSlots = ["09:30 AM", "11:00 AM", "01:30 PM", "03:00 PM", "04:30 PM"];
 
@@ -17,11 +18,43 @@ export function FinalCTA() {
 
   const [formData, setFormData] = useState({ name: "", email: "", notes: "" });
   const [errors, setErrors] = useState({ name: false, email: false });
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Initialize on mount to prevent hydration issues
   useEffect(() => {
     setMounted(true);
     setCurrentMonthDate(new Date());
+
+    // Respect prefers-reduced-motion
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) return;
+
+    const el = containerRef.current;
+    if (!el) return;
+
+    const leftCol = el.querySelector(".cta-left-col");
+    const rightCol = el.querySelector(".cta-right-col");
+
+    if (leftCol && rightCol) {
+      gsap.set([leftCol, rightCol], { opacity: 0, y: 30 });
+      const trigger = ScrollTrigger.create({
+        trigger: el,
+        start: "top 82%",
+        onEnter: () => {
+          gsap.to([leftCol, rightCol], {
+            opacity: 1,
+            y: 0,
+            duration: 0.65,
+            stagger: 0.15,
+            ease: "power2.out",
+            overwrite: "auto",
+          });
+        },
+      });
+      return () => {
+        trigger.kill();
+      };
+    }
   }, []);
 
   const today = new Date();
@@ -84,11 +117,11 @@ export function FinalCTA() {
 
   return (
     <section id="booking" className="bg-white py-24 lg:py-32">
-      <div className="max-w-[1200px] mx-auto px-6">
+      <div ref={containerRef} className="max-w-[1200px] mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
 
           {/* Left Column */}
-          <FadeUp className="lg:col-span-5 space-y-6">
+          <div className="cta-left-col lg:col-span-5 space-y-6">
             <span
               className="inline-block text-[11px] font-medium tracking-[0.18em] uppercase mb-4 px-3 py-1 rounded-full text-black/50"
               style={{ background: "#f3f3f3" }}
@@ -103,7 +136,7 @@ export function FinalCTA() {
                 letterSpacing: "-0.5px",
               }}
             >
-              Ready to Start Your Project?
+              <SplitText text="Ready to Start Your Project?" type="words" triggerSelector="#booking" />
             </h2>
             <p className="text-black/50" style={{ fontSize: 16, lineHeight: 1.65 }}>
               Book a 30-minute discovery call with our principal architects. We'll discuss your
@@ -126,10 +159,10 @@ export function FinalCTA() {
                 </div>
               ))}
             </div>
-          </FadeUp>
+          </div>
 
           {/* Right Column — Booking Widget */}
-          <FadeUp delay={0.1} className="lg:col-span-7">
+          <div className="cta-right-col lg:col-span-7">
             <div
               className="p-7 md:p-8 min-h-[460px] flex flex-col justify-center"
               style={{ background: "#e8e8fc", borderRadius: 24 }}
@@ -205,7 +238,7 @@ export function FinalCTA() {
                                   type="button"
                                   disabled={!isAvail}
                                   onClick={() => { setSelectedDate(thisDate); setSelectedSlot(null); }}
-                                  className="h-8 w-8 mx-auto flex items-center justify-center text-[12px] font-mono font-bold rounded-full transition-all"
+                                  className="h-8 w-8 mx-auto flex items-center justify-center text-[12px] font-mono font-bold rounded-full transition-all hover:scale-110 active:scale-95 duration-200"
                                   style={{
                                     background: isSel ? "#000" : isAvail ? "rgba(0,0,0,0.07)" : "transparent",
                                     color: isSel ? "#fff" : isAvail ? "#000" : "rgba(0,0,0,0.2)",
@@ -233,7 +266,7 @@ export function FinalCTA() {
                                     key={slot}
                                     type="button"
                                     onClick={() => setSelectedSlot(slot)}
-                                    className="w-full py-2 px-4 text-[13px] font-medium rounded-[9999px] border-2 transition-all"
+                                    className="w-full py-2 px-4 text-[13px] font-medium rounded-[9999px] border-2 transition-all hover:scale-[1.02] active:scale-[0.98] duration-200"
                                     style={{
                                       background: isSel ? "#000" : "#fff",
                                       color: isSel ? "#fff" : "#000",
@@ -367,7 +400,7 @@ export function FinalCTA() {
                 </AnimatePresence>
               )}
             </div>
-          </FadeUp>
+          </div>
         </div>
       </div>
     </section>

@@ -5,6 +5,9 @@ import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Magnetic } from "@/components/ui/Magnetic";
+import { InteractiveBackground } from "@/components/ui/InteractiveBackground";
+import { SplitText } from "@/components/ui/SplitText";
+import { gsap } from "@/lib/gsapInit";
 
 const technologies = [
   "Next.js",
@@ -28,7 +31,7 @@ const industries = [
 const repeatedTech = Array(8).fill(technologies).flat();
 const repeatedIndustries = Array(8).fill(industries).flat();
 
-/* Individual blob with mouse parallax */
+/* Individual blob with mouse parallax and floating logic */
 function ParallaxBlob({
   style,
   depth = 0.05,
@@ -39,20 +42,68 @@ function ParallaxBlob({
   className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const el = ref.current;
+    const inner = innerRef.current;
+    if (!el || !inner) return;
+
+    // Respect prefers-reduced-motion
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) return;
+
+    // Outer container tracks mouse move (parallax)
     const onMove = (e: MouseEvent) => {
-      const el = ref.current;
-      if (!el) return;
       const cx = window.innerWidth / 2;
       const cy = window.innerHeight / 2;
       const dx = (e.clientX - cx) * depth;
       const dy = (e.clientY - cy) * depth;
-      el.style.transform = `translate(${dx}px, ${dy}px)`;
+      
+      gsap.to(el, {
+        x: dx,
+        y: dy,
+        duration: 0.8,
+        ease: "power2.out",
+        overwrite: "auto",
+      });
     };
     window.addEventListener("mousemove", onMove, { passive: true });
-    return () => window.removeEventListener("mousemove", onMove);
-  }, [depth]);
+
+    // Inner container handles slow rotation and float drift
+    const isCircle = style.borderRadius === "50%";
+    let rotationTween: gsap.core.Tween | null = null;
+    let floatTween: gsap.core.Tween | null = null;
+    
+    if (!isCircle) {
+      const duration = 40 + Math.random() * 40;
+      rotationTween = gsap.to(inner, {
+        rotation: 360,
+        duration: duration,
+        repeat: -1,
+        ease: "none",
+      });
+    }
+
+    // Slow sinusoidal up-and-down drift
+    floatTween = gsap.to(inner, {
+      y: "+=15",
+      duration: 3 + Math.random() * 3,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut",
+    });
+
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      if (rotationTween) rotationTween.kill();
+      if (floatTween) floatTween.kill();
+      gsap.killTweensOf(el);
+      gsap.killTweensOf(inner);
+    };
+  }, [depth, style.borderRadius]);
+
+  const { top, left, right, bottom, width, height } = style;
 
   return (
     <div
@@ -61,18 +112,68 @@ function ParallaxBlob({
       style={{
         position: "absolute",
         pointerEvents: "none",
-        transition: "transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)",
         zIndex: 0,
-        ...style,
+        top,
+        left,
+        right,
+        bottom,
+        width,
+        height,
       }}
-    />
+    >
+      <div
+        ref={innerRef}
+        className="w-full h-full"
+        style={{
+          borderRadius: style.borderRadius,
+          background: style.background,
+          opacity: style.opacity,
+        }}
+      />
+    </div>
   );
 }
 
 export function Hero() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) return;
+
+    const flare = containerRef.current?.querySelector(".hero-gradient-flare");
+    if (!flare) return;
+
+    // Drifting flare animation
+    const anim = gsap.to(flare, {
+      x: "12vw",
+      y: "8vh",
+      duration: 15,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut",
+    });
+
+    return () => {
+      anim.kill();
+    };
+  }, []);
+
   return (
-    <section className="relative min-h-screen flex flex-col justify-center bg-white overflow-hidden pt-28 pb-24">
+    <section ref={containerRef} className="relative min-h-screen flex flex-col justify-center bg-white overflow-hidden pt-28 pb-24">
+      {/* WebGL particle background accent */}
+      <InteractiveBackground />
+
+      {/* Drifting gradient flare */}
+      <div 
+        className="hero-gradient-flare absolute top-1/4 left-1/3 w-[450px] h-[450px] rounded-full filter blur-[130px] pointer-events-none opacity-[0.1] z-0"
+        style={{
+          background: "radial-gradient(circle, #7575f0 0%, #3cdd8c 50%, transparent 100%)",
+        }}
+      />
+
       {/* ── Parallax confetti blobs ── */}
+
       <ParallaxBlob
         depth={0.04}
         style={{ top: -60, left: -60, width: 220, height: 220, borderRadius: "50%", background: "#3cdd8c", opacity: 0.92 }}
@@ -125,10 +226,7 @@ export function Hero() {
         </motion.div>
 
         {/* Headline */}
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+        <h1
           className="font-display font-medium text-black max-w-4xl mb-6"
           style={{
             fontSize: "clamp(44px, 6vw, 72px)",
@@ -136,27 +234,31 @@ export function Hero() {
             letterSpacing: "clamp(-0.5px, -0.015em, -1.08px)",
           }}
         >
-          Custom Software, Web Apps &{" "}
-          <span
+          <SplitText text="Custom Software, Web Apps &" type="words" delay={0.08} />{" "}
+          <motion.span
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.22, ease: "easeOut" }}
             style={{
+              display: "inline-block",
               background: "linear-gradient(90deg, #3cdd8c 0%, #7575f0 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
             }}
           >
             Digital Solutions
-          </span>{" "}
-          Built For Growth
-        </motion.h1>
+          </motion.span>{" "}
+          <SplitText text="Built For Growth" type="words" delay={0.36} />
+        </h1>
 
         {/* Sub-headline */}
         <motion.p
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.22 }}
-          className="text-black/55 font-sans text-[17px] max-w-[580px] mb-10 leading-relaxed"
+          transition={{ duration: 0.4, delay: 0.25 }}
+          className="text-black/65 font-display text-[19px] font-normal tracking-tight max-w-[620px] mb-10 leading-relaxed"
         >
-          We create websites, mobile applications, SaaS platforms, and custom software solutions that help businesses scale faster.
+          A premium software engineering & product design studio. We partner with startups and enterprises to build custom web apps, mobile solutions, and scalable SaaS platforms.
         </motion.p>
 
         {/* CTA row — magnetic buttons */}
@@ -166,31 +268,39 @@ export function Hero() {
           transition={{ duration: 0.35, delay: 0.3 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-20"
         >
-          <Magnetic strength={0.3}>
-            <Link
-              href="/contact"
-              className="shimmer-hover inline-flex items-center gap-2 px-7 py-3 text-[16px] font-medium text-white rounded-[9999px] transition-all hover:bg-neutral-800 active:scale-[0.97]"
-              style={{
-                background: "#000",
-                boxShadow: "rgba(255,255,255,0.5) 0px 2px 2px 0px, rgba(0,0,0,0.2) 0px 3px 3px 0px",
-              }}
-            >
-              Start Your Project
-              <ArrowRight size={15} />
-            </Link>
-          </Magnetic>
+          <Link
+            href="/contact"
+            className="flex items-center shrink-0"
+          >
+            <Magnetic strength={0.3}>
+              <span
+                className="shimmer-hover inline-flex items-center gap-2 px-7 py-3 text-[16px] font-medium text-white rounded-[9999px] transition-all hover:bg-neutral-800 active:scale-[0.97]"
+                style={{
+                  background: "#000",
+                  boxShadow: "rgba(255,255,255,0.5) 0px 2px 2px 0px, rgba(0,0,0,0.2) 0px 3px 3px 0px",
+                }}
+              >
+                Start Your Project
+                <ArrowRight size={15} />
+              </span>
+            </Magnetic>
+          </Link>
 
-          <Magnetic strength={0.3}>
-            <Link
-              href="/projects"
-              className="inline-flex items-center gap-2 px-7 py-3 text-[16px] font-medium text-black rounded-[9999px] border-2 border-black hover:bg-[#f3f3f3] active:scale-[0.97] transition-all"
-              style={{
-                boxShadow: "rgba(255,255,255,0.5) 0px 2px 2px 0px, rgba(0,0,0,0.2) 0px 3px 3px 0px",
-              }}
-            >
-              View Case Studies
-            </Link>
-          </Magnetic>
+          <Link
+            href="/projects"
+            className="flex items-center shrink-0"
+          >
+            <Magnetic strength={0.3}>
+              <span
+                className="inline-flex items-center gap-2 px-7 py-3 text-[16px] font-medium text-black rounded-[9999px] border-2 border-black hover:bg-[#f3f3f3] active:scale-[0.97] transition-all"
+                style={{
+                  boxShadow: "rgba(255,255,255,0.5) 0px 2px 2px 0px, rgba(0,0,0,0.2) 0px 3px 3px 0px",
+                }}
+              >
+                View Case Studies
+              </span>
+            </Magnetic>
+          </Link>
         </motion.div>
 
         {/* Marquee Section */}

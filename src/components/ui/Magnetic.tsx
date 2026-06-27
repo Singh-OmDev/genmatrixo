@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useCallback } from "react";
+import { useRef, useEffect } from "react";
+import { gsap } from "@/lib/gsapInit";
 
 interface MagneticProps {
   children: React.ReactNode;
@@ -9,41 +10,59 @@ interface MagneticProps {
 
 /**
  * Magnetic — wraps children with a magnetic hover pull effect.
- * The element drifts toward the cursor and snaps back on leave.
+ * The element drifts toward the cursor using GSAP and snaps back organically on leave.
  */
 export function Magnetic({ children, strength = 0.35 }: MagneticProps) {
   const ref = useRef<HTMLDivElement>(null);
 
-  const handleMove = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      const el = ref.current;
-      if (!el) return;
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    // Respect prefers-reduced-motion
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
       const rect = el.getBoundingClientRect();
       const cx = rect.left + rect.width / 2;
       const cy = rect.top + rect.height / 2;
       const dx = (e.clientX - cx) * strength;
       const dy = (e.clientY - cy) * strength;
-      el.style.transform = `translate(${dx}px, ${dy}px)`;
-      el.style.transition = "transform 0.1s linear";
-    },
-    [strength]
-  );
 
-  const handleLeave = useCallback(() => {
-    const el = ref.current;
-    if (!el) return;
-    el.style.transform = "translate(0px, 0px)";
-    el.style.transition = "transform 0.5s cubic-bezier(0.23, 1, 0.32, 1)";
-  }, []);
+      gsap.to(el, {
+        x: dx,
+        y: dy,
+        duration: 0.3,
+        ease: "power2.out",
+        overwrite: "auto",
+      });
+    };
+
+    const handleMouseLeave = () => {
+      gsap.to(el, {
+        x: 0,
+        y: 0,
+        duration: 0.8,
+        ease: "elastic.out(1, 0.4)",
+        overwrite: "auto",
+      });
+    };
+
+    el.addEventListener("mousemove", handleMouseMove);
+    el.addEventListener("mouseleave", handleMouseLeave);
+
+    return () => {
+      el.removeEventListener("mousemove", handleMouseMove);
+      el.removeEventListener("mouseleave", handleMouseLeave);
+      gsap.killTweensOf(el);
+    };
+  }, [strength]);
 
   return (
-    <div
-      ref={ref}
-      onMouseMove={handleMove}
-      onMouseLeave={handleLeave}
-      style={{ display: "inline-flex" }}
-    >
+    <div ref={ref} className="inline-flex">
       {children}
     </div>
   );
 }
+

@@ -1,9 +1,10 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { Box, CreditCard, ShieldCheck, Activity, Cpu, Cloud } from "lucide-react";
-import { FadeUp } from "@/components/motion/FadeUp";
-import { StaggerContainer, StaggerItem } from "@/components/motion/StaggerContainer";
 import { Card3D } from "@/components/ui/Card3D";
+import { SplitText } from "@/components/ui/SplitText";
+import { gsap, ScrollTrigger } from "@/lib/gsapInit";
 
 const tints = ["#d4f7e6", "#e8e8fc", "#ffeecc", "#ffccf7", "#eddee9", "#f3f3f3"];
 
@@ -17,34 +18,68 @@ const saasPillars = [
 ];
 
 export function SaaSShowcase() {
-  return (
-    <section className="bg-white py-24 lg:py-32">
-      <div className="max-w-[1200px] mx-auto px-6">
-        <FadeUp>
-          <div className="text-center mb-16">
-            <span
-              className="inline-block text-[11px] font-medium tracking-[0.18em] uppercase mb-4 px-3 py-1 rounded-full text-black/50"
-              style={{ background: "#f3f3f3" }}
-            >
-              Tailored SaaS Engineering
-            </span>
-            <h2
-              className="font-display font-medium text-black mx-auto mb-4"
-              style={{ fontSize: "clamp(32px, 4.5vw, 54px)", lineHeight: 1.22, letterSpacing: "-0.5px", maxWidth: 620 }}
-            >
-              Build Your SaaS Product
-            </h2>
-            <p className="text-black/50 max-w-md mx-auto" style={{ fontSize: 16, lineHeight: 1.6 }}>
-              We specialize in engineering multi-tenant platforms from MVP launch to secure cloud scaling.
-            </p>
-          </div>
-        </FadeUp>
+  const containerRef = useRef<HTMLDivElement>(null);
 
-        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+  useEffect(() => {
+    // Respect prefers-reduced-motion
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) return;
+
+    const el = containerRef.current;
+    if (!el) return;
+
+    const cards = el.querySelectorAll(".saas-card-wrapper");
+    if (cards.length === 0) return;
+
+    gsap.set(cards, { opacity: 0, y: 35 });
+
+    const trigger = ScrollTrigger.create({
+      trigger: el,
+      start: "top 80%",
+      onEnter: () => {
+        gsap.to(cards, {
+          opacity: 1,
+          y: 0,
+          duration: 0.65,
+          stagger: 0.1,
+          ease: "power2.out",
+          overwrite: "auto",
+        });
+      },
+    });
+
+    return () => {
+      trigger.kill();
+    };
+  }, []);
+
+  return (
+    <section id="saas-showcase" className="bg-white py-24 lg:py-32">
+      <div ref={containerRef} className="max-w-[1200px] mx-auto px-6">
+        
+        <div className="text-center mb-16">
+          <span
+            className="inline-block text-[11px] font-medium tracking-[0.18em] uppercase mb-4 px-3 py-1 rounded-full text-black/50"
+            style={{ background: "#f3f3f3" }}
+          >
+            Tailored SaaS Engineering
+          </span>
+          <h2
+            className="font-display font-medium text-black mx-auto mb-4"
+            style={{ fontSize: "clamp(32px, 4.5vw, 54px)", lineHeight: 1.22, letterSpacing: "-0.5px", maxWidth: 620 }}
+          >
+            <SplitText text="Build Your SaaS Product" type="words" triggerSelector="#saas-showcase" />
+          </h2>
+          <p className="text-black/50 max-w-md mx-auto" style={{ fontSize: 16, lineHeight: 1.6 }}>
+            We specialize in engineering multi-tenant platforms from MVP launch to secure cloud scaling.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {saasPillars.map((pillar, idx) => {
             const Icon = pillar.icon;
             return (
-              <StaggerItem key={pillar.title}>
+              <div key={pillar.title} className="saas-card-wrapper">
                 <Card3D
                   className="h-full shimmer-hover"
                   style={{ background: tints[idx % tints.length], borderRadius: 24, padding: 32 }}
@@ -63,11 +98,12 @@ export function SaaSShowcase() {
                     {pillar.description}
                   </p>
                 </Card3D>
-              </StaggerItem>
+              </div>
             );
           })}
-        </StaggerContainer>
+        </div>
       </div>
     </section>
   );
 }
+

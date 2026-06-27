@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import {
   Code2,
   Smartphone,
@@ -9,9 +10,9 @@ import {
   LineChart,
   Megaphone,
 } from "lucide-react";
-import { FadeUp } from "@/components/motion/FadeUp";
-import { StaggerContainer, StaggerItem } from "@/components/motion/StaggerContainer";
 import { Card3D } from "@/components/ui/Card3D";
+import { SplitText } from "@/components/ui/SplitText";
+import { gsap, ScrollTrigger } from "@/lib/gsapInit";
 
 const services = [
   { icon: Code2, title: "Web Development", description: "High-performance web applications and portal runtimes engineered to be fast, responsive, and secure." },
@@ -24,39 +25,84 @@ const services = [
 ];
 
 export function Services() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Respect prefers-reduced-motion
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) return;
+
+    const el = containerRef.current;
+    if (!el) return;
+
+    const cards = el.querySelectorAll(".service-card-wrapper");
+    if (cards.length === 0) return;
+
+    // Set 3D initial state
+    gsap.set(cards, {
+      opacity: 0,
+      y: 40,
+      rotationX: 10,
+      transformPerspective: 1000,
+    });
+
+    const trigger = ScrollTrigger.create({
+      trigger: el,
+      start: "top 80%",
+      onEnter: () => {
+        gsap.to(cards, {
+          opacity: 1,
+          y: 0,
+          rotationX: 0,
+          duration: 0.7,
+          stagger: 0.1,
+          ease: "power2.out",
+          overwrite: "auto",
+        });
+      },
+    });
+
+    return () => {
+      trigger.kill();
+    };
+  }, []);
+
   return (
     <section id="services" className="py-24 lg:py-32" style={{ background: "#3a2234" }}>
-      <div className="max-w-[1200px] mx-auto px-6">
+      <div ref={containerRef} className="max-w-[1200px] mx-auto px-6">
+        
         {/* Heading — white text on dark */}
-        <FadeUp>
-          <div className="text-center mb-16">
-            <span
-              className="inline-block text-[11px] font-medium tracking-[0.18em] uppercase mb-4 px-3 py-1 rounded-full"
-              style={{ background: "rgba(255,255,255,0.1)", color: "#939eeb" }}
-            >
-              Our Services
-            </span>
-            <h2
-              className="font-display font-medium mx-auto"
-              style={{
-                fontSize: "clamp(36px, 5vw, 60px)",
-                lineHeight: 1.22,
-                letterSpacing: "-0.6px",
-                maxWidth: 700,
-                color: "#ffffff",   /* explicit white on dark */
-              }}
-            >
-              Technical solutions engineered with precision, scalability, and impact.
-            </h2>
-          </div>
-        </FadeUp>
+        <div className="text-center mb-16">
+          <span
+            className="inline-block text-[11px] font-medium tracking-[0.18em] uppercase mb-4 px-3 py-1 rounded-full"
+            style={{ background: "rgba(255,255,255,0.1)", color: "#939eeb" }}
+          >
+            Our Services
+          </span>
+          <h2
+            className="font-display font-medium mx-auto"
+            style={{
+              fontSize: "clamp(36px, 5vw, 60px)",
+              lineHeight: 1.22,
+              letterSpacing: "-0.6px",
+              maxWidth: 700,
+              color: "#ffffff",
+            }}
+          >
+            <SplitText
+              text="Technical solutions engineered with precision, scalability, and impact."
+              type="words"
+              triggerSelector="#services"
+            />
+          </h2>
+        </div>
 
         {/* 3D card grid */}
-        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {services.slice(0, 6).map((service) => {
             const Icon = service.icon;
             return (
-              <StaggerItem key={service.title}>
+              <div key={service.title} className="service-card-wrapper">
                 <Card3D
                   className="h-full shimmer-hover"
                   style={{ background: "#ffffff", borderRadius: 24, padding: 32 }}
@@ -75,16 +121,16 @@ export function Services() {
                     {service.description}
                   </p>
                 </Card3D>
-              </StaggerItem>
+              </div>
             );
           })}
-        </StaggerContainer>
+        </div>
 
         {/* 7th service wide */}
         {services[6] && (
-          <FadeUp delay={0.2}>
+          <div className="service-card-wrapper mt-5">
             <Card3D
-              className="mt-5 shimmer-hover"
+              className="shimmer-hover"
               style={{ background: "#ffffff", borderRadius: 24, padding: 32, display: "flex", alignItems: "center", gap: 24 }}
               intensity={3}
             >
@@ -107,9 +153,10 @@ export function Services() {
                 );
               })()}
             </Card3D>
-          </FadeUp>
+          </div>
         )}
       </div>
     </section>
   );
 }
+
